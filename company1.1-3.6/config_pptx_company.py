@@ -20,7 +20,7 @@ LLM_WORD_COUNT = 280
 DOWNLOADS_PATH = os.path.join(os.path.expanduser("~"), "Downloads")
 
 # 改用使用者在桌面手繪並由 PowerPoint 另存的新模板，避免舊 PptxGenJS 模板的結構問題
-SEED_TEMPLATE_PATH = r"C:\Users\User\Desktop\handdrawppt.pptx"
+SEED_TEMPLATE_PATH = str(BASE_DIR.parent / "assets2" / "handdrawppt.pptx")
 
 OUTPUT_PATH = str(BASE_DIR / "output")
 # Assets 已移到上一層目錄

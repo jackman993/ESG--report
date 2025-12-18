@@ -19,7 +19,7 @@ LLM_WORD_COUNT = 280
 # Paths
 DOWNLOADS_PATH = os.path.join(os.path.expanduser("~"), "Downloads")
 # 使用 handdrawppt.pptx 作為母版模板（A4 landscape）
-SEED_TEMPLATE_PATH = r"C:\Users\User\Desktop\handdrawppt.pptx"
+SEED_TEMPLATE_PATH = str(BASE_DIR.parent / "assets2" / "handdrawppt.pptx")
 OUTPUT_PATH = str(BASE_DIR / "output")
 # Assets 已移到上一層目錄
 ASSETS2_PATH = str(BASE_DIR.parent / "assets2")
