@@ -138,8 +138,12 @@ def render_api_key_input():
     # 返回已保存的 key（優先）或輸入的 key（臨時使用）
     api_key = st.session_state.get("api_key") or input_key
     
-    if not api_key:
+    if not api_key or not api_key.strip():
         st.sidebar.warning("⚠️ 請輸入 API Key 並點擊「確認保存」")
+        return ""  # 返回空字串而不是 None
+    
+    # 清理 API key（移除前後空白）
+    api_key = api_key.strip()
     
     return api_key
 
@@ -159,8 +163,12 @@ def generate_report_summary(step: str, context_data: dict, api_key: str, test_mo
     if test_mode:
         return "【測試模式】報告摘要：本報告涵蓋環境治理、碳排放管理、TCFD氣候風險評估等關鍵議題，展現公司在永續發展方面的具體作為與成果。"
     
+    # 驗證 API key
+    if not api_key or not api_key.strip():
+        return "❌ API Key 未設置，無法生成摘要"
+    
     try:
-        client = anthropic.Anthropic(api_key=api_key)
+        client = anthropic.Anthropic(api_key=api_key.strip())
         
         # 根據步驟構建不同的prompt
         if step == "Step 1":
@@ -261,7 +269,19 @@ def generate_report_summary(step: str, context_data: dict, api_key: str, test_mo
         
         return summary
     
+    except anthropic.AuthenticationError as auth_err:
+        # API 認證錯誤
+        error_msg = str(auth_err)
+        if "redacted" in error_msg.lower() or "api key" in error_msg.lower():
+            return "❌ API Key 認證失敗：請檢查 API Key 是否正確或已過期。前往 https://console.anthropic.com/ 確認 API Key 狀態"
+        return f"❌ API 認證失敗：{error_msg[:100]}"
+    except anthropic.APIError as api_err:
+        # API 調用錯誤（配額、服務不可用等）
+        return f"❌ API 調用失敗：可能是配額用盡或服務暫時不可用，請稍後再試"
     except Exception as e:
-        # 如果生成失敗，返回友好提示
-        return f"摘要生成失敗：{str(e)[:50]}..."
+        # 其他錯誤
+        error_msg = str(e)
+        if len(error_msg) > 100:
+            error_msg = error_msg[:100] + "..."
+        return f"❌ 摘要生成失敗：{error_msg}"
 

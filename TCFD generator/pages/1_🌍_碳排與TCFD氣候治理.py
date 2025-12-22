@@ -13,13 +13,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from shared.config import *
 from shared.utils import render_output_folder_links, render_api_key_input, render_sidebar_navigation, generate_report_summary, switch_page
 
-# 加入 TCFD_Table 路徑
-sys.path.append(str(Path(__file__).parent.parent / "TCFD_Table"))
+# 加入 TCFD_Table 路徑（tcfd_* 模組位於此目錄）
+tcfd_table_path = Path(__file__).parent.parent / "TCFD_Table"
+sys.path.insert(0, str(tcfd_table_path))
 
-# 加入 Emission 引擎路徑（從 ESG go 目錄）
-BASE_DIR = Path(__file__).parent.parent.parent  # ESG go/
-EMISSION_ENGINE_PATH = BASE_DIR / "emission"
-sys.path.insert(0, str(EMISSION_ENGINE_PATH))
+# 從 TCFD_Table 目錄導入 tcfd 模組
 from tcfd_01_transformation import create_table as create_01
 from tcfd_02_market import create_table as create_02
 from tcfd_03_physical import create_table as create_03
@@ -310,9 +308,15 @@ st.subheader("📊 子步驟2: TCFD 表格生成")
 st.info("生成 5 個 TCFD 氣候風險表格")
 
 if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_width=True, key="btn_tcfd"):
-    if not API_KEY:
-        st.error("請先在左側輸入 API Key")
+    # 驗證 API Key
+    if not API_KEY or not API_KEY.strip():
+        st.error("❌ 請先在左側輸入有效的 API Key")
         st.stop()
+    
+    # 驗證 API Key 格式（Anthropic API key 通常以 sk-ant- 開頭）
+    if not API_KEY.startswith("sk-ant-"):
+        st.warning("⚠️ API Key 格式可能不正確（應以 sk-ant- 開頭）")
+        # 不停止，讓用戶嘗試
     
     if not industry:
         st.error("請輸入產業")
@@ -334,7 +338,14 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     if industry:
         st.session_state.industry_selected = industry
     
-    client = anthropic.Anthropic(api_key=API_KEY)
+    # 初始化 Anthropic client（加入錯誤處理）
+    try:
+        client = anthropic.Anthropic(api_key=API_KEY.strip())
+    except Exception as e:
+        st.error(f"❌ API Key 初始化失敗：{str(e)}")
+        st.info("💡 請檢查 API Key 是否正確，或前往 https://console.anthropic.com/ 獲取新的 API Key")
+        st.stop()
+    
     results = []
     tcfd_summary = {}
     
@@ -350,21 +361,8 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     for idx, table in enumerate(TABLES):
         st.info(f"⏳ {table['name']}...")
         
-        # LLM
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1024,
-            messages=[{"role": "user", "content": table["prompt"].format(**prompt_params)}]
-        )
-        llm_output = response.content[0].text.strip()
-        lines = [line.strip() for line in llm_output.split('\n') if line.strip() and '|||' in line]
-        
-        # 偵錯：如果沒有解析到資料
-        if len(lines) == 0:
-            st.warning(f"⚠️ {table['name']} LLM 回傳格式異常，重試中...")
-            with st.expander(f"LLM 原始回應 - {table['name']}"):
-                st.code(llm_output)
-            # 重試一次
+        # LLM（加入錯誤處理）
+        try:
             response = client.messages.create(
                 model="claude-sonnet-4-20250514",
                 max_tokens=1024,
@@ -372,6 +370,39 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
             )
             llm_output = response.content[0].text.strip()
             lines = [line.strip() for line in llm_output.split('\n') if line.strip() and '|||' in line]
+            
+            # 偵錯：如果沒有解析到資料
+            if len(lines) == 0:
+                st.warning(f"⚠️ {table['name']} LLM 回傳格式異常，重試中...")
+                with st.expander(f"LLM 原始回應 - {table['name']}"):
+                    st.code(llm_output)
+                # 重試一次
+                try:
+                    response = client.messages.create(
+                        model="claude-sonnet-4-20250514",
+                        max_tokens=1024,
+                        messages=[{"role": "user", "content": table["prompt"].format(**prompt_params)}]
+                    )
+                    llm_output = response.content[0].text.strip()
+                    lines = [line.strip() for line in llm_output.split('\n') if line.strip() and '|||' in line]
+                except anthropic.AuthenticationError as auth_err:
+                    st.error(f"❌ API 認證失敗：{str(auth_err)}")
+                    st.info("💡 請檢查 API Key 是否正確或已過期")
+                    st.stop()
+                except Exception as retry_err:
+                    st.error(f"❌ 重試失敗：{str(retry_err)}")
+                    st.stop()
+        except anthropic.AuthenticationError as auth_err:
+            st.error(f"❌ API 認證失敗：{str(auth_err)}")
+            st.info("💡 請檢查 API Key 是否正確或已過期。前往 https://console.anthropic.com/ 確認 API Key 狀態")
+            st.stop()
+        except anthropic.APIError as api_err:
+            st.error(f"❌ API 調用失敗：{str(api_err)}")
+            st.info("💡 可能是 API 配額用盡或服務暫時不可用，請稍後再試")
+            st.stop()
+        except Exception as e:
+            st.error(f"❌ 發生錯誤：{str(e)}")
+            st.stop()
         
         # 擷取 TCFD 摘要
         if idx == 0 and lines:  # 01 轉型風險
