@@ -36,6 +36,15 @@ class PPTContentEngine:
         # 載入環境段 log 資料
         self.env_log_data = self._load_environment_log()
         self.env_context = get_prompt_context(self.env_log_data)
+        
+        # 調試信息：確認產業別是否成功載入
+        industry = self.env_context.get("industry", "")
+        if industry:
+            print(f"[DEBUG] PPTContentEngine: 成功載入產業別: {industry}")
+        else:
+            print(f"[WARN] PPTContentEngine: 未能從 log 載入產業別，env_context keys: {list(self.env_context.keys())}")
+            if self.env_log_data:
+                print(f"[DEBUG] env_log_data 中的 industry: {self.env_log_data.get('industry', 'NOT FOUND')}")
 
     def _resolve_model(self) -> str:
         candidates = []
