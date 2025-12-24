@@ -159,10 +159,17 @@ if step1_done:
                     )
                     st.balloons()
                     
-                    # 保存 session log
+                    # 保存 session log（包含產業別和 TCFD 市場摘錄）
+                    # 從 session_state 取得產業別和 TCFD 摘要
+                    industry_name = st.session_state.get("industry_selected") or st.session_state.get("industry", "")
+                    tcfd_summary = st.session_state.get("tcfd_summary", {})
+                    market_trend = tcfd_summary.get("market_trend", "") if tcfd_summary else ""
+                    
                     session_log = {
                         "step": "Step 2",
                         "company_name": company_name if company_name else "本公司",
+                        "industry": industry_name,
+                        "tcfd_market_trend": market_trend,
                         "output_path": str(output_path),
                         "summary": summary
                     }

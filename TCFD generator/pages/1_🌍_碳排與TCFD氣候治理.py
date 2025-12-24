@@ -172,7 +172,10 @@ st.divider()
 st.subheader("🌱 子步驟1: 碳排放計算")
 st.info("使用月電費計算碳排放量")
 
-# 導入 Emission 引擎
+# 導入 Emission 引擎（從 ESG go 目錄的 emission 資料夾）
+BASE_DIR = Path(__file__).parent.parent.parent  # ESG--report/
+EMISSION_ENGINE_PATH = BASE_DIR / "emission"
+sys.path.insert(0, str(EMISSION_ENGINE_PATH))
 from emission_calc import Inputs, estimate
 
 # 選擇模式
