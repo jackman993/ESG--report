@@ -387,6 +387,7 @@ class PPTContentEngine:
             industry = self.env_log_data.get("industry", "").strip() if self.env_log_data.get("industry") else ""
             company_name = self.env_log_data.get("company_name", "本公司").strip() or "本公司"
             tcfd_market = self.env_log_data.get("tcfd_market_trends", "")
+            print(f"[DEBUG] 從 env_log_data 讀取: industry={repr(industry)}")
         
         # 如果還是沒有產業別，直接讀取最新的 Step 1 文件
         if not industry:
@@ -419,8 +420,10 @@ class PPTContentEngine:
         if industry:
             prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
             prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
+            print(f"[DEBUG] prompt 已加入產業別: {industry}")
         else:
             prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+            print(f"[ERROR] prompt 未加入產業別！industry={repr(industry)}")
         
         prompt += "總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
@@ -432,6 +435,14 @@ class PPTContentEngine:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
             prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
+        
+        # 最後檢查 prompt 是否包含產業別
+        if industry:
+            if industry in prompt:
+                print(f"[OK] 最終檢查: prompt 包含產業別 '{industry}'")
+            else:
+                print(f"[ERROR] 最終檢查: prompt 不包含產業別 '{industry}'！")
+                print(f"[ERROR] prompt 前500字: {prompt[:500]}")
         
         return self._call(prompt, word_count=230, is_chinese=True)
 

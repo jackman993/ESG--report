@@ -61,8 +61,29 @@ def load_latest_environment_log(log_dir: Optional[Path] = None) -> Optional[Dict
         print(f"[WARN] No log files found in: {log_dir}")
         return None
     
-    # 按修改時間排序，取最新的
-    latest_file = max(json_files, key=lambda f: f.stat().st_mtime)
+    # 直接找最新的 Step 1 文件（產業別一定在 Step 1）
+    latest_step1_file = None
+    latest_step1_time = 0
+    for log_file in json_files:
+        try:
+            with open(log_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            step = str(data.get("step", "")).lower()
+            if "step 1" in step and data.get("industry"):
+                file_time = log_file.stat().st_mtime
+                if file_time > latest_step1_time:
+                    latest_step1_time = file_time
+                    latest_step1_file = log_file
+        except:
+            continue
+    
+    # 如果找到 Step 1 文件，就用它；否則用最新的文件
+    if latest_step1_file:
+        latest_file = latest_step1_file
+        print(f"[INFO] 使用最新的 Step 1 文件: {latest_file.name}")
+    else:
+        # 按修改時間排序，取最新的
+        latest_file = max(json_files, key=lambda f: f.stat().st_mtime)
     
     try:
         # 先讀取最新的檔案
