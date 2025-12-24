@@ -211,8 +211,8 @@ def _standardize_log_data(raw_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     standardized = {}
     
-    # 產業別
-    standardized["industry"] = raw_data.get("industry", "General Industry")
+    # 產業別（如果沒有找到，保持空字串而不是設置默認值）
+    standardized["industry"] = raw_data.get("industry", "")
     
     # 月電費和推估營收
     company_profile = raw_data.get("company_profile", {})
@@ -312,7 +312,15 @@ def get_prompt_context(log_data: Optional[Dict[str, Any]] = None) -> Dict[str, s
     revenue_display = log_data.get("estimated_revenue_display", "")
     company_size = log_data.get("company_size", "")
     
-    company_context = f"公司營運於 {industry} 產業。"
+    # 調試信息：確認產業別是否成功提取
+    if not industry:
+        print(f"[WARN] get_prompt_context: 未能從 log_data 中提取產業別")
+        print(f"[DEBUG] log_data keys: {list(log_data.keys())}")
+        print(f"[DEBUG] log_data['industry']: {repr(log_data.get('industry', 'KEY NOT FOUND'))}")
+    else:
+        print(f"[INFO] get_prompt_context: 成功提取產業別: {industry}")
+    
+    company_context = f"公司營運於 {industry} 產業。" if industry else "公司營運資訊。"
     if revenue_display:
         company_context += f" 推估年營收：{revenue_display}。"
     if company_size:
