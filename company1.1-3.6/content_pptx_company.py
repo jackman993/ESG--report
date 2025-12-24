@@ -113,20 +113,9 @@ class PPTContentEngine:
         else:
             content = f"Respond in English with exactly {word_count} words.\n\n{prompt}"
         
-        # 在實際發送給 LLM 之前，檢查 prompt 是否包含產業別
-        industry = self.env_context.get("industry", "")
-        print(f"[DEBUG] _call: 準備發送 prompt 給 LLM")
-        print(f"[DEBUG] _call: industry={repr(industry)}")
-        print(f"[DEBUG] _call: prompt 長度={len(prompt)}")
-        print(f"[DEBUG] _call: prompt 前 500 字: {prompt[:500]}")
-        if industry:
-            if industry in prompt:
-                print(f"[OK] _call: 產業別 '{industry}' 已包含在 prompt 中")
-            else:
-                print(f"[ERROR] _call: 產業別 '{industry}' 未包含在 prompt 中！")
-                print(f"[ERROR] _call: 這表示 prompt 構建有問題")
-        else:
-            print(f"[WARN] _call: 產業別為空，無法包含在 prompt 中")
+        # 簡單檢查 prompt 是否包含產業別
+        if "產業" in prompt:
+            print(f"[OK] _call: prompt 包含產業別")
         
         response = self.client.messages.create(
             model=self.model,
@@ -389,49 +378,48 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_cooperation_info(self) -> str:
-        # 整合環境段 log 資料（公司背景、名稱、產業、市場）
-        print(f"[DEBUG] ========== generate_cooperation_info 開始 ==========")
-        print(f"[DEBUG] generate_cooperation_info: self.env_context 類型: {type(self.env_context)}")
-        print(f"[DEBUG] generate_cooperation_info: self.env_context keys: {list(self.env_context.keys())}")
+        # 直接從 env_log_data 獲取產業別（簡化，不經過 env_context）
+        industry = ""
+        company_name = "本公司"
+        tcfd_market = ""
         
-        company_context = self.env_context.get("company_context", "")
-        company_name = self.env_context.get("company_name", "本公司")
-        industry = self.env_context.get("industry", "")
-        tcfd_market = self.env_context.get("tcfd_market_context", "")
+        if self.env_log_data:
+            industry = self.env_log_data.get("industry", "").strip() if self.env_log_data.get("industry") else ""
+            company_name = self.env_log_data.get("company_name", "本公司").strip() or "本公司"
+            tcfd_market = self.env_log_data.get("tcfd_market_trends", "")
         
-        # 調試信息：確認產業別是否正確獲取
-        print(f"[DEBUG] generate_cooperation_info: 從 env_context 獲取的值")
-        print(f"[DEBUG]   - company_context: {repr(company_context)}")
-        print(f"[DEBUG]   - company_name: {repr(company_name)}")
-        print(f"[DEBUG]   - industry: {repr(industry)}")
-        print(f"[DEBUG]   - industry 類型: {type(industry)}")
-        print(f"[DEBUG]   - industry 是否為空字串: {industry == ''}")
-        print(f"[DEBUG]   - industry 是否為 None: {industry is None}")
-        print(f"[DEBUG]   - tcfd_market: {repr(tcfd_market[:50] if tcfd_market else '')}")
-        
+        # 如果還是沒有產業別，直接讀取最新的 Step 1 文件
         if not industry:
-            print(f"[ERROR] generate_cooperation_info: 產業別為空！")
-            print(f"[ERROR]   - env_context.industry 直接獲取: {repr(self.env_context.get('industry'))}")
-            print(f"[ERROR]   - env_context.industry 類型: {type(self.env_context.get('industry'))}")
-            if self.env_log_data:
-                print(f"[DEBUG] generate_cooperation_info: env_log_data.industry={repr(self.env_log_data.get('industry', 'NOT FOUND'))}")
-                print(f"[DEBUG] generate_cooperation_info: env_log_data keys: {list(self.env_log_data.keys()) if self.env_log_data else 'None'}")
+            from env_log_reader import DEFAULT_LOG_DIR
+            import json
+            log_dir = Path(DEFAULT_LOG_DIR)
+            if log_dir.exists():
+                json_files = list(log_dir.glob("*.json"))
+                # 優先找 Step 1 文件
+                for log_file in sorted(json_files, key=lambda f: f.stat().st_mtime, reverse=True):
+                    try:
+                        with open(log_file, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                        step = str(data.get("step", "")).lower()
+                        if "step 1" in step and data.get("industry"):
+                            industry = str(data.get("industry")).strip()
+                            if industry:
+                                print(f"[INFO] 直接從 Step 1 文件讀取產業別: {industry} (來源: {log_file.name})")
+                                break
+                    except:
+                        continue
         
-        print(f"[DEBUG] generate_cooperation_info: 開始構建 prompt")
+        company_context = self.env_context.get("company_context", "") if self.env_context else ""
+        
         prompt = self._format_expert_intro(company_name, industry)
-        print(f"[DEBUG] generate_cooperation_info: _format_expert_intro 結果: {repr(prompt[:100])}")
-        
         prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
         prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
         prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
         
-        print(f"[DEBUG] generate_cooperation_info: 檢查 industry 條件 (industry={repr(industry)}, bool(industry)={bool(industry)})")
         if industry:
-            print(f"[DEBUG] generate_cooperation_info: 進入 industry 分支，添加產業別相關 prompt")
             prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
             prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
         else:
-            print(f"[WARN] generate_cooperation_info: 進入 else 分支（產業別為空），使用通用 prompt")
             prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
         
         prompt += "總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
@@ -441,14 +429,9 @@ class PPTContentEngine:
         if company_context:
             prompt += f"\n\n公司背景：{company_context}"
         if industry:
-            print(f"[DEBUG] generate_cooperation_info: 再次檢查 industry，添加產業別到 prompt 末尾")
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
             prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
-        
-        print(f"[DEBUG] generate_cooperation_info: prompt 構建完成，長度: {len(prompt)}")
-        print(f"[DEBUG] generate_cooperation_info: prompt 中是否包含產業別 '{industry}': {industry in prompt if industry else 'N/A (industry is empty)'}")
-        print(f"[DEBUG] ========== generate_cooperation_info 結束，準備調用 _call ==========")
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
