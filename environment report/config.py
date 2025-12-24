@@ -17,7 +17,7 @@ ENVIRONMENT_CONFIG = {
     'total_pages': 17,
     'layout': 'A4_horizontal',
     'font_family': 'Microsoft JhengHei',
-    'font_size': 10,  # 小字體
+    'font_size': 12,  # 統一文字大小
     'table_split': '50_50'  # 左右各50%
 }
 

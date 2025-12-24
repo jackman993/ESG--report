@@ -31,7 +31,7 @@ PPT_CONFIG = {
     "output_filename": "ESG_PPT_AB_7slides_cleanup.pptx",
     "total_slides": 18,  # 增加2張章節封面
     "font_family": "Calibri",
-    "font_size": 11,
+    "font_size": 12,
     "watermark_text": "Sustainability Report",
 }
 
@@ -75,7 +75,7 @@ SLIDE_CONFIGS = {
         "image_width_cm": 14.0,
         "image_align": "right",
         "paragraphs": 2,  # 啟用文字框
-        "text_font_size": 11,
+        "text_font_size": 12,
         "title_font_pt": 20,
         "title_top_cm": 1.2,
         "title_left_cm": 2.5,
@@ -109,7 +109,7 @@ SLIDE_CONFIGS = {
             },
         },
         "paragraphs": 2,  # 啟用文字框
-        "text_font_size": 11,
+        "text_font_size": 12,
         "title_font_pt": 20,
         "title_top_cm": 1.2,
         "title_left_cm": 2.5,
@@ -120,7 +120,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_legal_alignment_overview",  # 啟用 LLM 文字生成
         "fallback_text": "",
         "paragraphs": 2,  # 啟用文字框
-        "text_font_size": 11,
+        "text_font_size": 12,
         "image_path": os.path.join(ASSETS2_PATH, "5.3legal.png"),
         "image_width_cm": 14.0,
         "image_align": "right",
@@ -135,7 +135,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_legal_appliance_overview",  # 啟用 LLM 文字生成
         "fallback_text": "",
         "paragraphs": 2,  # 啟用文字框
-        "text_font_size": 11,
+        "text_font_size": 12,
         "title_font_pt": 20,
         "title_top_cm": 1.2,
         "title_left_cm": 2.5,
@@ -198,7 +198,7 @@ SLIDE_CONFIGS = {
         "layout": "C",
         "content_method": "generate_supervisory_board_overview",  # 使用 LLM 生成中文文本
         "fallback_text": "",
-        "text_font_size": 11,
+        "text_font_size": 12,
         "title_font_pt": 20,
         "title_top_cm": 1.2,
         "title_left_cm": 2.5,
@@ -284,7 +284,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_community_investment",
         "fallback_text": A_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         # 測試：啟用簡單表格 6.1
         "right_component": {
@@ -311,7 +311,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_health_safety",
         "fallback_text": A_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         "image_path": os.path.join(ASSETS3_PATH, "6.2health.png"),
         "image_width_cm": 14.0,
@@ -325,7 +325,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_diversity_policies",
         "fallback_text": A_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         "right_content_method": "generate_social_diversity_kpis",
         "right_fallback_text": B_TEXT_FALLBACK,
@@ -347,7 +347,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_labor_rights",
         "fallback_text": A_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         "right_content_method": "generate_social_fair_employment",
         "right_fallback_text": B_TEXT_FALLBACK,
@@ -370,7 +370,7 @@ SLIDE_CONFIGS = {
         "content_method": None,
         "fallback_text": "",
         "paragraphs": 0,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         # 測試：啟用簡單表格 6.5
         "left_component": {
@@ -403,7 +403,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_showcase_intro",
         "fallback_text": B_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         "text_box": {
             "left_cm": 3.0,
@@ -440,7 +440,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_flow_explanation",
         "fallback_text": B_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         # 6.7 使用 PNG 圖片（SocialImpactFlow 組件已刪除，改用圖片替代）
         "image_paths": [
@@ -459,7 +459,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_product_responsibility",
         "fallback_text": A_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         "right_content_method": "generate_social_customer_welfare",
         "right_fallback_text": B_TEXT_FALLBACK,
@@ -486,7 +486,7 @@ SLIDE_CONFIGS = {
         "content_method": "generate_social_innovation",
         "fallback_text": A_TEXT_FALLBACK,
         "paragraphs": 2,
-        "text_font_size": 11,
+        "text_font_size": 12,
         "paragraph_spacing_pt": 0,
         "right_content_method": "generate_social_inclusive_economy",
         "right_fallback_text": B_TEXT_FALLBACK,

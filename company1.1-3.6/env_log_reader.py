@@ -15,7 +15,7 @@ from datetime import datetime
 # {
 #   "industry": "Food Industry",
 #   "monthly_electricity_bill_ntd": 125890.0,
-#   "estimated_revenue_ntd": 45320400.0,  # monthly_bill * 360
+#   "estimated_revenue_ntd": 45320400.0,  # monthly_bill * 12 * 40
 #   "estimated_revenue_display": "22.66-30.21 million NTD",
 #   "company_size": "Small-Medium Enterprise",
 #   "tcfd_policy_regulation": "Carbon tax policies expected to be implemented from 2024-2030...",
@@ -94,8 +94,8 @@ def _standardize_log_data(raw_data: Dict[str, Any]) -> Dict[str, Any]:
     monthly_bill = company_profile.get("monthly_bill_ntd", 0.0)
     standardized["monthly_electricity_bill_ntd"] = monthly_bill
     
-    # 推估營收（月電費 × 360）
-    estimated_revenue = monthly_bill * 360
+    # 推估營收（月電費 × 12個月 × 40倍）
+    estimated_revenue = monthly_bill * 12 * 40
     standardized["estimated_revenue_ntd"] = estimated_revenue
     
     # 營收顯示格式（加上數值標註避免混淆）

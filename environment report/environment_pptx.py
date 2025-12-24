@@ -165,7 +165,7 @@ class EnvironmentPPTXEngine:
         
         # 樣式設定
         self.title_font_size = Pt(28)
-        self.body_font_size = Pt(14)
+        self.body_font_size = Pt(12)
         self.font_name = 'Microsoft JhengHei'
         self.primary_color = RGBColor(26, 58, 46)  # 深綠色
         self.secondary_color = RGBColor(74, 124, 89)  # 淺綠色
