@@ -15,6 +15,50 @@ def switch_page(page_path: str):
     st.session_state.page_changed = True
     st.rerun()
 
+def clear_all_data():
+    """清除所有前次資料，重置系統狀態"""
+    from pathlib import Path
+    
+    # 清除 session_state 中的完成狀態和所有相關資料
+    keys_to_clear = [
+        # 步驟完成狀態
+        "step1_done", "step2_done", "step3_done", "step4_done",
+        "emission_done",
+        # 資料相關
+        "emission_data", "tcfd_summary", "company_profile", "company_name",
+        "industry", "industry_selected", "session_id", "timestamp",
+        # 輸出相關
+        "step1_output_filename", "step2_output_filename", "step3_output_filename",
+        "tcfd_output_folder", "emission_output_folder",
+        # 其他可能的狀態變數
+        "current_step", "report_generated", "output_path",
+        "emission_calculated", "tcfd_generated", "company_report_generated",
+        "governance_report_generated", "final_report_generated",
+        # 確認狀態
+        "confirm_reset",
+        # API Key 保留（不清除，讓用戶可以繼續使用）
+        # "api_key",  # 註釋掉，保留 API Key
+    ]
+    
+    for key in keys_to_clear:
+        if key in st.session_state:
+            del st.session_state[key]
+    
+    # 清除 log 文件（可選，保留註釋以便用戶選擇）
+    # 如果需要清除 log 文件，取消以下註釋：
+    # log_dir = Path(ESG_OUTPUT_ROOT) / "_Backend" / "user_logs"
+    # if log_dir.exists():
+    #     for log_file in log_dir.glob("*.json"):
+    #         try:
+    #             log_file.unlink()
+    #         except Exception as e:
+    #             st.warning(f"無法刪除 {log_file.name}: {e}")
+    
+    # 重置到首頁
+    st.session_state.current_page = "pages/0_🏠_首頁.py"
+    
+    return True
+
 def render_sidebar_navigation():
     """渲染側邊欄導航（使用按鈕，不依賴 pages 系統）"""
     # 隱藏 Streamlit 自動導航（上半部），保留自定義導航
@@ -53,6 +97,30 @@ def render_sidebar_navigation():
             # 設定目標頁面到 session_state，然後重新載入
             st.session_state.current_page = page
             st.session_state.page_changed = True
+            st.rerun()
+    
+    # 添加重新開始按鈕
+    st.sidebar.divider()
+    st.sidebar.markdown("### 🔄 重新開始")
+    
+    # 檢查是否處於確認狀態
+    if st.session_state.get("confirm_reset", False):
+        st.sidebar.warning("⚠️ 確定要清除所有資料並重新開始嗎？")
+        col1, col2 = st.sidebar.columns(2)
+        with col1:
+            if st.sidebar.button("✅ 確認", use_container_width=True, key="confirm_clear"):
+                clear_all_data()
+                st.session_state.confirm_reset = False
+                st.sidebar.success("✅ 資料已清除！")
+                st.rerun()
+        with col2:
+            if st.sidebar.button("❌ 取消", use_container_width=True, key="cancel_clear"):
+                st.session_state.confirm_reset = False
+                st.rerun()
+    else:
+        # 顯示重新開始按鈕
+        if st.sidebar.button("🔄 清除資料並重新開始", use_container_width=True, type="secondary", key="reset_button"):
+            st.session_state.confirm_reset = True
             st.rerun()
 
 def render_output_folder_links():
