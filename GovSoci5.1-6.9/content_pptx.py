@@ -132,13 +132,12 @@ class PPTContentEngine:
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         company_context = self.env_context.get("company_context", "")
         
-        prompt = f"你是一位資深的 ESG 顧問和{industry}產業分析專家。"
-        prompt += f"請為一家{industry}公司撰寫約 420 字（對應 280 英文單字）的治理結構概述，用於 ESG 報告。"
-        prompt += f"必須緊扣{industry}產業的治理特色，描述治理架構、董事會組成、監督節奏和利害關係人溝通。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 420 字（對應 280 英文單字）的治理結構概述，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的治理特色，描述治理架構、董事會組成、監督節奏和利害關係人溝通。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用高階主管語調，保持專業且易於理解。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -171,13 +170,12 @@ class PPTContentEngine:
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         tcfd_policy = self.env_context.get("tcfd_policy_context", "")
         
-        prompt = f"你是一位{industry}產業法規遵循專家和 ESG 顧問。"
-        prompt += f"請為一家{industry}公司撰寫約 420 字（對應 280 英文單字）的法規遵循說明，用於 ESG 報告。"
-        prompt += f"必須說明{industry}產業如何維持法規對齊、協調合規利害關係人，以及升級法律風險。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 420 字（對應 280 英文單字）的法規遵循說明，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，說明如何維持法規對齊、協調合規利害關係人，以及升級法律風險。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用專業且清晰的語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -194,13 +192,12 @@ class PPTContentEngine:
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         tcfd_policy = self.env_context.get("tcfd_policy_context", "")
         
-        prompt = f"你是一位{industry}產業法規遵循專家和 ESG 顧問。"
-        prompt += f"請為一家{industry}公司撰寫約 420 字（對應 280 英文單字）的法律遵循計畫說明，用於 ESG 報告。"
-        prompt += f"必須說明{industry}產業的法律遵循計畫，強調架構、稽核軌跡、內部控制和對治理的益處。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 420 字（對應 280 英文單字）的法律遵循計畫說明，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，說明法律遵循計畫，強調架構、稽核軌跡、內部控制和對治理的益處。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用專業且具說服力的語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -255,14 +252,13 @@ class PPTContentEngine:
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         tcfd_policy = self.env_context.get("tcfd_policy_context", "")
         
-        prompt = f"你是一位{industry}產業職業安全衛生專家和 ESG 顧問。"
-        prompt += f"請為一家{industry}公司撰寫約 360 字（對應 240 英文單字）的員工健康、安全和福祉治理說明，用於 ESG 報告。"
-        prompt += f"必須結合{industry}產業的特性，參考 ISO 45001 和 ISO 45003，涵蓋危害識別、心理健康資源、職業健康投資、參與機制和成功指標。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 360 字（對應 240 英文單字）的員工健康、安全和福祉治理說明，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，參考 ISO 45001 和 ISO 45003，涵蓋危害識別、心理健康資源、職業健康投資、參與機制和成功指標。"
         prompt += "說明氣候相關法規可能如何影響工作環境和職業安全規劃。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用專業且清晰的語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -342,14 +338,13 @@ class PPTContentEngine:
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         emission_context = self.env_context.get("emission_context", "")
         
-        prompt = f"你是一位{industry}產業社會責任專家和 ESG 顧問。"
-        prompt += f"請為一家{industry}公司撰寫約 330 字（對應 220 英文單字）的社會行動計畫概述，用於 ESG 報告。"
-        prompt += "必須為社會行動計畫表格提供敘述背景，概述優先順序邏輯、負責人、進度追蹤、利害關係人回饋循環，以及已完成倡議如何指導下一波承諾。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 330 字（對應 220 英文單字）的社會行動計畫概述，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，為社會行動計畫表格提供敘述背景，概述優先順序邏輯、負責人、進度追蹤、利害關係人回饋循環，以及已完成倡議如何指導下一波承諾。"
         prompt += "說明市場期望和環境績效如何影響社會投資優先順序。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用專業且清晰的語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -397,15 +392,14 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "該產業")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
-        prompt = f"你是一位{industry}產業產品責任專家和 ESG 顧問。"
-        prompt += f"請為一家{industry}公司撰寫約 345 字（對應 230 英文單字）的產品責任計畫說明，用於 ESG 報告。"
-        prompt += "必須參考 ISO 9001、ISO 10377 和 ISO 26000 消費者議題（6.7），說明公司的產品責任計畫。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）的產品責任計畫說明，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，參考 ISO 9001、ISO 10377 和 ISO 26000 消費者議題（6.7），說明公司的產品責任計畫。"
         prompt += "涵蓋品質設計控制、客戶回饋分析、售後服務和對弱勢使用者的保護措施。"
         prompt += "說明市場對永續產品的期望如何影響產品責任策略。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用專業且具說服力的語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -419,15 +413,14 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "該產業")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
-        prompt = f"你是一位{industry}產業消費者保護專家和 ESG 顧問。"
-        prompt += f"請為一家{industry}公司撰寫約 345 字（對應 230 英文單字）的客戶福祉保護說明，用於 ESG 報告。"
-        prompt += "必須說明如何透過透明度、負責任行銷、資料隱私、申訴解決和生命週期管理來保護客戶福祉。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）的客戶福祉保護說明，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，說明如何透過透明度、負責任行銷、資料隱私、申訴解決和生命週期管理來保護客戶福祉。"
         prompt += "包含與消費者保護機構的夥伴關係，以及用於監控信任的指標。"
         prompt += "說明市場對永續產品的期望如何影響客戶保護策略。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用專業且清晰的語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:

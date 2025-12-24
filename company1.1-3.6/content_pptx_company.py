@@ -272,15 +272,15 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
-        prompt = "請提供約 345 字（對應 230 英文單字）描述公司的合作概況。"
-        prompt += "重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
+        prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
         prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
-        prompt += "總結背景、商業模式、地理足跡、策略夥伴關係和組織架構。"
+        prompt += "\n\n必須緊扣{industry}產業的特性，總結背景、商業模式、地理足跡、策略夥伴關係和組織架構。"
         prompt += "強調使命、價值觀，以及合作如何支撐長期競爭力。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if company_context:
             prompt += f"\n\n公司背景：{company_context}"
         if industry:
@@ -309,13 +309,13 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
-        prompt = "請撰寫約 375 字（對應 250 英文單字）的利害關係人識別章節，用於 ESG 報告。"
-        prompt += "識別關鍵利害關係人群體，如投資人、客戶、員工、監管機構、供應商和社區，說明每個群體的重要性。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）的利害關係人識別章節，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，識別關鍵利害關係人群體，如投資人、客戶、員工、監管機構、供應商和社區，說明每個群體的重要性。"
         prompt += "討論他們的期望、若被忽視的潛在風險，以及如何設定優先順序。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的高階主管語調，不使用項目符號或標題。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -384,13 +384,13 @@ class PPTContentEngine:
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         emission_context = self.env_context.get("emission_context", "")
         
-        prompt = "請撰寫約 375 字（對應 250 英文單字）說明公司的 ESG 核心支柱，涵蓋地球（Planet）、產品（Products）和人員（People）。"
-        prompt += "討論重點領域、跨價值鏈的整合、衡量實務和問責機制。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）說明公司的 ESG 核心支柱，涵蓋地球（Planet）、產品（Products）和人員（People），用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，討論重點領域、跨價值鏈的整合、衡量實務和問責機制。"
         prompt += "提及表格顯示每個支柱的摘要和倡議。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，避免項目符號。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
@@ -436,11 +436,12 @@ class PPTContentEngine:
         emission_context = self.env_context.get("emission_context", "")
         company_context = self.env_context.get("company_context", "")
         
-        prompt = "請撰寫約 375 字（對應 250 英文單字）說明公司如何將永續目標與標示的 SDG 圖示對齊。"
-        prompt += "詳細說明關鍵計畫、夥伴關係、指標和治理結構，這些將 SDG 與商業價值和利害關係人期望連結。"
+        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）說明公司如何將永續目標與標示的 SDG 圖示對齊，用於 ESG 報告。"
+        prompt += f"\n\n必須緊扣{industry}產業的特性，詳細說明關鍵計畫、夥伴關係、指標和治理結構，這些將 SDG 與商業價值和利害關係人期望連結。"
+        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
+        prompt += "使用簡潔的中文，保持專業且易於理解的語調。"
         
-        if company_name:
-            prompt += f"\n\n公司名稱：{company_name}"
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
