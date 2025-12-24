@@ -32,7 +32,12 @@ DEFAULT_LOG_DIR = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
 
 def load_latest_environment_log(log_dir: Optional[Path] = None) -> Optional[Dict[str, Any]]:
     """
-    讀取最新的環境段 log 檔案
+    讀取最新的環境段 log 檔案並合併同一個 session 的資料
+    此函數會：
+    1. 找到最新的 log 檔案
+    2. 從該檔案中提取 session_id
+    3. 找到所有相同 session_id 的 log 檔案
+    4. 合併所有檔案的資料（特別是從 Step 1 獲取產業別）
     
     Args:
         log_dir: Log 資料夾路徑（預設使用 DEFAULT_LOG_DIR）
@@ -60,13 +65,133 @@ def load_latest_environment_log(log_dir: Optional[Path] = None) -> Optional[Dict
     latest_file = max(json_files, key=lambda f: f.stat().st_mtime)
     
     try:
+        # 先讀取最新的檔案
         with open(latest_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
+            latest_data = json.load(f)
         
-        # 轉換為標準格式（如果來源格式不同）
-        standardized = _standardize_log_data(data)
+        # 從最新檔案中提取 session_id
+        session_id = latest_data.get("session_id", "")
+        
+        # 如果我們有 session_id，嘗試從同一個 session 的其他檔案中尋找並合併資料
+        merged_data = latest_data.copy()
+        
+        if session_id:
+            # 找到所有相同 session_id 的檔案
+            session_files = [f for f in json_files if f != latest_file]
+            
+            for session_file in session_files:
+                try:
+                    with open(session_file, "r", encoding="utf-8") as f:
+                        session_data = json.load(f)
+                    
+                    # 檢查此檔案是否屬於同一個 session
+                    if session_data.get("session_id") == session_id:
+                        # 合併資料：優先從 Step 1 檔案中獲取產業別和 company_profile
+                        if "industry" in session_data and not merged_data.get("industry"):
+                            merged_data["industry"] = session_data["industry"]
+                        
+                        if "company_profile" in session_data:
+                            if "company_profile" not in merged_data:
+                                merged_data["company_profile"] = {}
+                            # 合併 company_profile，保留現有值除非缺失
+                            for key, value in session_data["company_profile"].items():
+                                if key not in merged_data["company_profile"]:
+                                    merged_data["company_profile"][key] = value
+                        
+                        # 合併 emission_data（如果可用）
+                        if "emission_data" in session_data:
+                            if "emission_data" not in merged_data:
+                                merged_data["emission_data"] = {}
+                            for key, value in session_data["emission_data"].items():
+                                if key not in merged_data["emission_data"]:
+                                    merged_data["emission_data"][key] = value
+                        
+                        # 合併 tcfd_summary（如果可用）
+                        if "tcfd_summary" in session_data:
+                            if "tcfd_summary" not in merged_data:
+                                merged_data["tcfd_summary"] = {}
+                            for key, value in session_data["tcfd_summary"].items():
+                                if key not in merged_data["tcfd_summary"]:
+                                    merged_data["tcfd_summary"][key] = value
+                        
+                        print(f"[INFO] Merged data from: {session_file.name}")
+                
+                except Exception as e:
+                    # 跳過無法讀取的檔案
+                    continue
+        
+        # 如果仍然缺少關鍵資料，嘗試從最近的包含完整資料的檔案中尋找
+        # 檢查我們缺少什麼
+        missing_industry = not merged_data.get("industry")
+        missing_company_profile = "company_profile" not in merged_data or not merged_data.get("company_profile")
+        missing_emission = "emission_data" not in merged_data or not merged_data.get("emission_data")
+        missing_tcfd = "tcfd_summary" not in merged_data or not merged_data.get("tcfd_summary")
+        
+        if missing_industry or missing_company_profile or missing_emission or missing_tcfd:
+            # 搜尋最近的檔案（按修改時間排序，最新的優先）
+            for log_file in sorted(json_files, key=lambda f: f.stat().st_mtime, reverse=True):
+                if log_file == latest_file:
+                    continue  # 跳過我們已經讀取的檔案
+                
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:
+                        file_data = json.load(f)
+                    
+                    # 合併產業別（如果缺失）
+                    if missing_industry and "industry" in file_data:
+                        merged_data["industry"] = file_data["industry"]
+                        print(f"[INFO] Found industry from: {log_file.name}")
+                        missing_industry = False
+                    
+                    # 合併 company_profile（如果缺失）
+                    if missing_company_profile and "company_profile" in file_data:
+                        if "company_profile" not in merged_data:
+                            merged_data["company_profile"] = {}
+                        for key, value in file_data["company_profile"].items():
+                            if key not in merged_data["company_profile"]:
+                                merged_data["company_profile"][key] = value
+                        if merged_data["company_profile"]:
+                            print(f"[INFO] Found company_profile from: {log_file.name}")
+                            missing_company_profile = False
+                    
+                    # 合併 emission_data（如果缺失）
+                    if missing_emission and "emission_data" in file_data:
+                        if "emission_data" not in merged_data:
+                            merged_data["emission_data"] = {}
+                        for key, value in file_data["emission_data"].items():
+                            if key not in merged_data["emission_data"]:
+                                merged_data["emission_data"][key] = value
+                        if merged_data["emission_data"]:
+                            print(f"[INFO] Found emission_data from: {log_file.name}")
+                            missing_emission = False
+                    
+                    # 合併 tcfd_summary（如果缺失）
+                    if missing_tcfd and "tcfd_summary" in file_data:
+                        if "tcfd_summary" not in merged_data:
+                            merged_data["tcfd_summary"] = {}
+                        for key, value in file_data["tcfd_summary"].items():
+                            if key not in merged_data["tcfd_summary"]:
+                                merged_data["tcfd_summary"][key] = value
+                        if merged_data["tcfd_summary"]:
+                            print(f"[INFO] Found tcfd_summary from: {log_file.name}")
+                            missing_tcfd = False
+                    
+                    # 如果我們找到了所有缺失的資料，停止搜尋
+                    if not (missing_industry or missing_company_profile or missing_emission or missing_tcfd):
+                        break
+                
+                except Exception:
+                    continue
+        
+        # 轉換為標準格式
+        standardized = _standardize_log_data(merged_data)
         
         print(f"[OK] Loaded environment log: {latest_file.name}")
+        if session_id:
+            print(f"[INFO] Session ID: {session_id}")
+        if standardized.get("industry"):
+            print(f"[INFO] Industry: {standardized['industry']}")
+        
         return standardized
     
     except Exception as e:
@@ -136,9 +261,17 @@ def _standardize_log_data(raw_data: Dict[str, Any]) -> Dict[str, Any]:
         "No market trend data available."
     )
     
-    # 碳排總額
+    # 碳排總額（支援 emission_result 和 emission_data 兩種格式）
     emission_result = raw_data.get("emission_result", {})
-    standardized["emission_total_tco2e"] = emission_result.get("total", 0.0)
+    emission_data = raw_data.get("emission_data", {})
+    
+    # 優先嘗試 emission_result，然後嘗試 emission_data
+    if emission_result and "total" in emission_result:
+        standardized["emission_total_tco2e"] = emission_result.get("total", 0.0)
+    elif emission_data and "total" in emission_data:
+        standardized["emission_total_tco2e"] = emission_data.get("total", 0.0)
+    else:
+        standardized["emission_total_tco2e"] = 0.0
     
     # 公司名稱
     standardized["company_name"] = raw_data.get("company_name", "").strip()
