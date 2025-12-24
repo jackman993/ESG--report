@@ -64,6 +64,23 @@ class PPTContentEngine:
                 return candidate
         return candidates[0] if candidates else "claude-3-haiku-20240307"
 
+    def _format_expert_intro(self, company_name: str, industry: str) -> str:
+        """
+        格式化專家介紹語句，正確處理空產業別的情況
+        
+        Args:
+            company_name: 公司名稱
+            industry: 產業別（可能為空）
+        
+        Returns:
+            格式化後的專家介紹語句
+        """
+        industry = industry.strip() if industry else ""
+        if industry:
+            return f"你是{company_name}的{industry}產業 ESG 專家。"
+        else:
+            return f"你是{company_name}的 ESG 專家。"
+
     def _call(self, prompt: str, word_count: int = LLM_WORD_COUNT, is_chinese: bool = True) -> str:
         """
         調用 LLM 生成內容
@@ -79,6 +96,18 @@ class PPTContentEngine:
             content = f"請用繁體中文撰寫約 {char_count} 字（對應 {word_count} 英文單字）。\n\n{prompt}"
         else:
             content = f"Respond in English with exactly {word_count} words.\n\n{prompt}"
+        
+        # 調試信息：檢查 prompt 中是否包含產業別
+        industry = self.env_context.get("industry", "")
+        if industry:
+            if industry in prompt:
+                print(f"[DEBUG] _call: 產業別 '{industry}' 已包含在 prompt 中")
+            else:
+                print(f"[WARN] _call: 產業別 '{industry}' 存在，但未包含在 prompt 中")
+                print(f"[DEBUG] Prompt preview (first 200 chars): {prompt[:200]}")
+        else:
+            print(f"[WARN] _call: 產業別為空，無法包含在 prompt 中")
+            print(f"[DEBUG] Prompt preview (first 200 chars): {prompt[:200]}")
         
         response = self.client.messages.create(
             model=self.model,
@@ -146,14 +175,21 @@ class PPTContentEngine:
     def generate_governance_overview(self) -> str:
         # 整合環境段 log 資料（產業別）
         company_name = self.env_context.get("company_name", "本公司")
-        industry = self.env_context.get("industry", "")
+        industry = self.env_context.get("industry", "").strip()
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        # 調試信息
+        print(f"[DEBUG] generate_governance_overview: industry={repr(industry)}, company_name={repr(company_name)}")
+        
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫高階主管級別的敘述，描述治理結構、董事會組成、監督節奏和利害關係人溝通。"
         
         if industry:
             prompt += f"\n\n必須依據{industry}產業的性質，提出相關的環境、財務法規遵循。"
             prompt += f"描述治理結構和監督機制，以應對{industry}產業特定的環境法規、財務合規要求和適用的監管框架。"
+        else:
+            prompt += f"\n\n必須依據公司所屬產業的性質，提出相關的環境、財務法規遵循。"
+            prompt += f"描述治理結構和監督機制，以應對產業特定的環境法規、財務合規要求和適用的監管框架。"
+            print(f"[WARN] generate_governance_overview: 產業別為空，使用通用描述")
         
         return self._call(prompt, is_chinese=True)
 
@@ -167,7 +203,7 @@ class PPTContentEngine:
         company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請總結公司如何維持與法規的對齊、協調合規利害關係人，以及升級法律風險。"
         
         if industry:
@@ -181,7 +217,7 @@ class PPTContentEngine:
         company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請說明法律遵循計畫，強調框架、審計追蹤、內部控制和對治理的益處。"
         
         if industry:
@@ -208,7 +244,7 @@ class PPTContentEngine:
         company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請總結員工健康、安全和福祉治理，參考 ISO 45001 和 ISO 45003。"
         prompt += "涵蓋危害識別、心理健康資源、職業健康投資、參與機制和成功指標。"
         
@@ -250,7 +286,7 @@ class PPTContentEngine:
         company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請為社會行動計畫表格提供敘述性背景，概述優先順序邏輯、負責人、進度追蹤、利害關係人回饋循環，以及已完成的倡議如何為下一波承諾提供資訊。"
         
         if industry:
@@ -277,7 +313,7 @@ class PPTContentEngine:
         company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請描述公司的產品責任計畫，參考 ISO 9001、ISO 10377 和 ISO 26000 消費者議題（6.7）。"
         prompt += "涵蓋品質設計控制、客戶回饋分析、售後服務和對弱勢使用者的保護措施。"
         
@@ -292,7 +328,7 @@ class PPTContentEngine:
         company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請說明如何透過透明度、負責任的行銷、資料隱私、投訴解決和生命週期管理來保護客戶福祉。"
         prompt += "包括與消費者保護機構的合作夥伴關係和用於監控信任的指標。"
         
@@ -340,7 +376,7 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
         prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
         prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
@@ -378,7 +414,7 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）的利害關係人識別章節，用於 ESG 報告。"
         prompt += f"\n\n必須緊扣{industry}產業的特性，識別關鍵利害關係人群體，如投資人、客戶、員工、監管機構、供應商和社區，說明每個群體的重要性。"
         prompt += "討論他們的期望、若被忽視的潛在風險，以及如何設定優先順序。"
@@ -398,7 +434,7 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）分析利害關係人的需求和影響力。"
         prompt += "涵蓋顯著性（權力、合法性、緊迫性）、重大議題、溝通節奏，以及監控參與成效的關鍵績效指標。"
         prompt += "保持高階主管語調，使用簡潔的中文，避免項目符號。"
@@ -461,7 +497,7 @@ class PPTContentEngine:
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         emission_context = self.env_context.get("emission_context", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）說明公司的 ESG 核心支柱，涵蓋地球（Planet）、產品（Products）和人員（People），用於 ESG 報告。"
         prompt += f"\n\n必須緊扣{industry}產業的特性，討論重點領域、跨價值鏈的整合、衡量實務和問責機制。"
         prompt += "提及表格顯示每個支柱的摘要和倡議。"
@@ -513,7 +549,7 @@ class PPTContentEngine:
         emission_context = self.env_context.get("emission_context", "")
         company_context = self.env_context.get("company_context", "")
         
-        prompt = f"你是{company_name}的{industry}產業 ESG 專家。"
+        prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）說明公司如何將永續目標與標示的 SDG 圖示對齊，用於 ESG 報告。"
         prompt += f"\n\n必須針對{industry}產業分析關係人屬性與關心的議題，說明哪些 SDG 與{industry}產業最相關，以及{industry}產業中利害關係人的關注如何與特定 SDG 目標對齊。"
         prompt += f"詳細說明{industry}產業特定的計畫、夥伴關係和指標，這些計畫、夥伴關係和指標解決{industry}產業背景下的利害關係人優先事項。"
