@@ -87,8 +87,13 @@ def load_latest_environment_log(log_dir: Optional[Path] = None) -> Optional[Dict
                     # 檢查此檔案是否屬於同一個 session
                     if session_data.get("session_id") == session_id:
                         # 合併資料：優先從 Step 1 檔案中獲取產業別和 company_profile
-                        if "industry" in session_data and not merged_data.get("industry"):
-                            merged_data["industry"] = session_data["industry"]
+                        # 必須檢查值是否為非空
+                        if "industry" in session_data:
+                            industry_value = session_data["industry"]
+                            if industry_value and str(industry_value).strip():
+                                if not merged_data.get("industry") or not str(merged_data.get("industry", "")).strip():
+                                    merged_data["industry"] = str(industry_value).strip()
+                                    print(f"[INFO] Merged industry '{merged_data['industry']}' from: {session_file.name}")
                         
                         if "company_profile" in session_data:
                             if "company_profile" not in merged_data:
@@ -121,15 +126,30 @@ def load_latest_environment_log(log_dir: Optional[Path] = None) -> Optional[Dict
                     continue
         
         # 如果仍然缺少關鍵資料，嘗試從最近的包含完整資料的檔案中尋找
-        # 檢查我們缺少什麼
-        missing_industry = not merged_data.get("industry")
+        # 檢查我們缺少什麼（必須檢查值是否為非空）
+        missing_industry = not merged_data.get("industry") or not str(merged_data.get("industry", "")).strip()
         missing_company_profile = "company_profile" not in merged_data or not merged_data.get("company_profile")
         missing_emission = "emission_data" not in merged_data or not merged_data.get("emission_data")
         missing_tcfd = "tcfd_summary" not in merged_data or not merged_data.get("tcfd_summary")
         
         if missing_industry or missing_company_profile or missing_emission or missing_tcfd:
-            # 搜尋最近的檔案（按修改時間排序，最新的優先）
-            for log_file in sorted(json_files, key=lambda f: f.stat().st_mtime, reverse=True):
+            # 優先搜尋 Step 1 的文件（產業別通常在 Step 1 中記錄）
+            # 先按 step 排序（Step 1 優先），然後按修改時間排序
+            def sort_key(f):
+                try:
+                    with open(f, "r", encoding="utf-8") as file:
+                        data = json.load(file)
+                        step = str(data.get("step", "")).lower()
+                        # Step 1 優先，然後按時間排序
+                        if "step 1" in step:
+                            return (0, f.stat().st_mtime)
+                        else:
+                            return (1, f.stat().st_mtime)
+                except:
+                    return (2, f.stat().st_mtime)
+            
+            # 搜尋最近的檔案（Step 1 優先，然後按修改時間排序）
+            for log_file in sorted(json_files, key=sort_key):
                 if log_file == latest_file:
                     continue  # 跳過我們已經讀取的檔案
                 
@@ -137,11 +157,14 @@ def load_latest_environment_log(log_dir: Optional[Path] = None) -> Optional[Dict
                     with open(log_file, "r", encoding="utf-8") as f:
                         file_data = json.load(f)
                     
-                    # 合併產業別（如果缺失）
+                    # 合併產業別（如果缺失）- 必須檢查值是否為非空
                     if missing_industry and "industry" in file_data:
-                        merged_data["industry"] = file_data["industry"]
-                        print(f"[INFO] Found industry from: {log_file.name}")
-                        missing_industry = False
+                        industry_value = file_data["industry"]
+                        # 檢查產業別是否為非空（不是空字串、None 或只包含空白）
+                        if industry_value and str(industry_value).strip():
+                            merged_data["industry"] = str(industry_value).strip()
+                            print(f"[INFO] Found industry '{merged_data['industry']}' from: {log_file.name} (step: {file_data.get('step', 'unknown')})")
+                            missing_industry = False
                     
                     # 合併 company_profile（如果缺失）
                     if missing_company_profile and "company_profile" in file_data:
@@ -211,8 +234,13 @@ def _standardize_log_data(raw_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     standardized = {}
     
-    # 產業別（如果沒有找到，保持空字串而不是設置默認值）
-    standardized["industry"] = raw_data.get("industry", "")
+    # 產業別（如果沒有找到或為空，保持空字串而不是設置默認值）
+    industry_raw = raw_data.get("industry", "")
+    # 確保產業別不是 None 且去除空白後不為空
+    if industry_raw and str(industry_raw).strip():
+        standardized["industry"] = str(industry_raw).strip()
+    else:
+        standardized["industry"] = ""
     
     # 月電費和推估營收
     company_profile = raw_data.get("company_profile", {})
