@@ -307,18 +307,31 @@ def get_prompt_context(log_data: Optional[Dict[str, Any]] = None) -> Dict[str, s
         }
     
     # 建立公司背景上下文
+    print(f"[DEBUG] get_prompt_context: 開始提取上下文")
+    print(f"[DEBUG] get_prompt_context: log_data 是否為 None: {log_data is None}")
+    if log_data:
+        print(f"[DEBUG] get_prompt_context: log_data keys: {list(log_data.keys())}")
+        print(f"[DEBUG] get_prompt_context: log_data['industry'] 原始值: {repr(log_data.get('industry', 'KEY NOT FOUND'))}")
+        print(f"[DEBUG] get_prompt_context: log_data['industry'] 類型: {type(log_data.get('industry'))}")
+        print(f"[DEBUG] get_prompt_context: log_data['industry'] 是否為空字串: {log_data.get('industry', '') == ''}")
+        print(f"[DEBUG] get_prompt_context: log_data['industry'] 是否為 None: {log_data.get('industry') is None}")
+    
     industry = log_data.get("industry", "")
     company_name = log_data.get("company_name", "").strip()
     revenue_display = log_data.get("estimated_revenue_display", "")
     company_size = log_data.get("company_size", "")
     
     # 調試信息：確認產業別是否成功提取
+    print(f"[DEBUG] get_prompt_context: 提取後的 industry 變數: {repr(industry)}")
+    print(f"[DEBUG] get_prompt_context: industry 類型: {type(industry)}")
+    print(f"[DEBUG] get_prompt_context: industry 是否為空字串: {industry == ''}")
+    print(f"[DEBUG] get_prompt_context: industry 是否為 None: {industry is None}")
     if not industry:
-        print(f"[WARN] get_prompt_context: 未能從 log_data 中提取產業別")
-        print(f"[DEBUG] log_data keys: {list(log_data.keys())}")
-        print(f"[DEBUG] log_data['industry']: {repr(log_data.get('industry', 'KEY NOT FOUND'))}")
+        print(f"[ERROR] get_prompt_context: 未能從 log_data 中提取產業別！")
+        print(f"[DEBUG] log_data keys: {list(log_data.keys()) if log_data else 'log_data is None'}")
+        print(f"[DEBUG] log_data['industry']: {repr(log_data.get('industry', 'KEY NOT FOUND') if log_data else 'log_data is None')}")
     else:
-        print(f"[INFO] get_prompt_context: 成功提取產業別: {industry}")
+        print(f"[OK] get_prompt_context: 成功提取產業別: {industry}")
     
     company_context = f"公司營運於 {industry} 產業。" if industry else "公司營運資訊。"
     if revenue_display:
