@@ -1,0 +1,655 @@
+2025-12-24 09:57:43,497 - company_engine_wrapper_zh - ERROR - API Key 驗證失敗：API Key 不能為空
+2025-12-24 09:57:43,498 - company_engine_wrapper_zh - ERROR - API Key 驗證失敗：API Key 不能為空
+2025-12-24 09:57:43,499 - company_engine_wrapper_zh - WARNING - API Key 格式可能不正確（應以 sk-ant- 開頭）
+2025-12-24 09:57:43,500 - company_engine_wrapper_zh - INFO - 開始生成公司段 PPTX
+2025-12-24 09:57:43,500 - company_engine_wrapper_zh - INFO - 載入公司段引擎: C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6
+2025-12-24 09:57:44,850 - company_engine_wrapper_zh - INFO - 初始化內容引擎...
+2025-12-24 09:57:45,451 - anthropic._base_client - DEBUG - Request options: {'method': 'get', 'url': '/v1/models', 'params': {}, 'headers': {}, 'post_parser': <function SyncAPIClient._request_api_list.<locals>._parser at 0x000001E1FA5A3EC0>, 'json_data': None}
+2025-12-24 09:57:45,486 - anthropic._base_client - DEBUG - Sending HTTP Request: GET https://api.anthropic.com/v1/models
+2025-12-24 09:57:45,486 - httpcore.connection - DEBUG - connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=5.0 socket_options=[(65535, 8, True), (6, 17, 60), (6, 16, 5), (6, 3, 60)]
+2025-12-24 09:57:45,532 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E1FA5BB650>
+2025-12-24 09:57:45,532 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x000001E1FA581370> server_hostname='api.anthropic.com' timeout=5.0
+2025-12-24 09:57:45,545 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E1FA5BB610>
+2025-12-24 09:57:45,545 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-12-24 09:57:45,545 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:57:45,546 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-12-24 09:57:45,546 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:57:45,546 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-12-24 09:57:45,764 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:57:46 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgZk617y4TrAgdwqrzo'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'35'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7d66cb074a45-TPE')])
+2025-12-24 09:57:45,765 - httpx - INFO - HTTP Request: GET https://api.anthropic.com/v1/models "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:57:45,766 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-12-24 09:57:45,766 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:57:45,767 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:57:45,767 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:57:45,767 - anthropic._base_client - DEBUG - HTTP Response: GET https://api.anthropic.com/v1/models "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:57:46 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgZk617y4TrAgdwqrzo', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '35', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7d66cb074a45-TPE'})
+2025-12-24 09:57:45,768 - anthropic._base_client - DEBUG - request_id: req_011CWQgZk617y4TrAgdwqrzo
+2025-12-24 09:57:45,768 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/models'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:57:45,814 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:57:45,815 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:57:45,840 - company_engine_wrapper_zh - INFO - 初始化 PPT 引擎...
+2025-12-24 09:57:45,852 - company_engine_wrapper_zh - INFO - 開始生成 PPTX...
+2025-12-24 09:57:45,918 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:57:45,919 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:57:45,919 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:57:45,919 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:57:45,920 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:57:45,920 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:57:45,920 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:57:45,920 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:57:45,921 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:57:45,921 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:57:45,921 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:57:45,922 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:57:45,928 - anthropic._base_client - DEBUG - Request options: {'method': 'post', 'url': '/v1/messages', 'timeout': Timeout(connect=5.0, read=600, write=600, pool=600), 'files': None, 'idempotency_key': 'stainless-python-retry-2baaeeb7-4e74-4d46-99ce-f9157c3d7ee5', 'json_data': {'max_tokens': 1100, 'messages': [{'role': 'user', 'content': '請用繁體中文撰寫約 330 字（對應 220 英文單字）。\n\n請撰寫約 330 字（對應 220 英文單字）的 CEO 訊息，用於 ESG 永續報告書。平衡啟發性與責任感：歡迎讀者、概述永續願景、強調近期 ESG 成就、承認仍面臨的挑戰，並呼籲利害關係人共同參與轉型旅程。使用「我們」和「本公司」，保持溫暖且專業的語調，避免元評論。\n\n公司背景：公司營運於 General Industry 產業。 推估年營收：0萬(0) NTD。 公司規模：Unknown。\n\n關鍵法規挑戰：No policy and regulation data available.'}], 'model': 'claude-3-5-sonnet-20241022'}}
+2025-12-24 09:57:45,929 - anthropic._base_client - DEBUG - Sending HTTP Request: POST https://api.anthropic.com/v1/messages
+2025-12-24 09:57:45,929 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-12-24 09:57:45,930 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:57:45,930 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-12-24 09:57:45,931 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:57:45,931 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-12-24 09:57:46,156 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:57:47 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgZmjy7hnYzrZZgzebZ'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'44'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7d692c964a45-TPE')])
+2025-12-24 09:57:46,157 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:57:46,158 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-12-24 09:57:46,158 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:57:46,159 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:57:46,159 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:57:46,159 - anthropic._base_client - DEBUG - HTTP Response: POST https://api.anthropic.com/v1/messages "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:57:47 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgZmjy7hnYzrZZgzebZ', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '44', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7d692c964a45-TPE'})
+2025-12-24 09:57:46,160 - anthropic._base_client - DEBUG - request_id: req_011CWQgZmjy7hnYzrZZgzebZ
+2025-12-24 09:57:46,161 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/messages'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:57:46,162 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:57:46,162 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:57:46,224 - company_engine_wrapper_zh - ERROR - 生成公司段失敗: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgZmjy7hnYzrZZgzebZ'}
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\company_engine_wrapper_zh.py", line 101, in generate_company_section_zh
+    output_path = ppt_engine.generate(company_name=company_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 78, in generate
+    self._generate_slide(idx)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 128, in _generate_slide
+    self._layout_a(slide, cfg)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 182, in _layout_a
+    text = self._get_slide_text(cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 619, in _get_slide_text
+    text = getattr(self.content_engine, method_name)()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 266, in generate_ceo_message
+    return self._call(prompt, word_count=220, is_chinese=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 74, in _call
+    response = self.client.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_utils\_utils.py", line 282, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\resources\messages\messages.py", line 930, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1326, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1114, in request
+    raise self._make_status_error_from_response(err.response) from None
+anthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgZmjy7hnYzrZZgzebZ'}
+
+2025-12-24 09:57:46,224 - company_engine_wrapper_zh - INFO - 環境狀態恢復完成
+2025-12-24 09:57:46,227 - company_engine_wrapper_zh - INFO - 開始生成公司段 PPTX
+2025-12-24 09:57:46,227 - company_engine_wrapper_zh - INFO - 載入公司段引擎: C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6
+2025-12-24 09:57:46,227 - company_engine_wrapper_zh - INFO - 初始化內容引擎...
+2025-12-24 09:57:46,716 - anthropic._base_client - DEBUG - Request options: {'method': 'get', 'url': '/v1/models', 'params': {}, 'headers': {}, 'post_parser': <function SyncAPIClient._request_api_list.<locals>._parser at 0x000001E1FAC6ACA0>, 'json_data': None}
+2025-12-24 09:57:46,717 - anthropic._base_client - DEBUG - Sending HTTP Request: GET https://api.anthropic.com/v1/models
+2025-12-24 09:57:46,717 - httpcore.connection - DEBUG - connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=5.0 socket_options=[(65535, 8, True), (6, 17, 60), (6, 16, 5), (6, 3, 60)]
+2025-12-24 09:57:46,736 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E1FA5BA2D0>
+2025-12-24 09:57:46,736 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x000001E1FA5FB1D0> server_hostname='api.anthropic.com' timeout=5.0
+2025-12-24 09:57:46,745 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000001E1FACB2350>
+2025-12-24 09:57:46,745 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-12-24 09:57:46,746 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:57:46,746 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-12-24 09:57:46,747 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:57:46,747 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-12-24 09:57:46,960 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:57:48 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgZqDaNZCsbpURS9mmY'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'30'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7d6e48128f24-TPE')])
+2025-12-24 09:57:46,960 - httpx - INFO - HTTP Request: GET https://api.anthropic.com/v1/models "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:57:46,960 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-12-24 09:57:46,961 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:57:46,962 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:57:46,962 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:57:46,963 - anthropic._base_client - DEBUG - HTTP Response: GET https://api.anthropic.com/v1/models "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:57:48 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgZqDaNZCsbpURS9mmY', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '30', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7d6e48128f24-TPE'})
+2025-12-24 09:57:46,963 - anthropic._base_client - DEBUG - request_id: req_011CWQgZqDaNZCsbpURS9mmY
+2025-12-24 09:57:46,964 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/models'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:57:46,965 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:57:46,965 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:57:46,978 - company_engine_wrapper_zh - INFO - 初始化 PPT 引擎...
+2025-12-24 09:57:46,988 - company_engine_wrapper_zh - INFO - 開始生成 PPTX...
+2025-12-24 09:57:46,993 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:57:46,993 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:57:46,994 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:57:46,994 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:57:46,994 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:57:46,994 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:57:46,995 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:57:46,995 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:57:46,995 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:57:46,995 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:57:46,996 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:57:46,996 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:57:46,998 - anthropic._base_client - DEBUG - Request options: {'method': 'post', 'url': '/v1/messages', 'timeout': Timeout(connect=5.0, read=600, write=600, pool=600), 'files': None, 'idempotency_key': 'stainless-python-retry-d398f8ee-44c6-4b84-9b1f-c4b8097f29bd', 'json_data': {'max_tokens': 1100, 'messages': [{'role': 'user', 'content': '請用繁體中文撰寫約 330 字（對應 220 英文單字）。\n\n請撰寫約 330 字（對應 220 英文單字）的 CEO 訊息，用於 ESG 永續報告書。平衡啟發性與責任感：歡迎讀者、概述永續願景、強調近期 ESG 成就、承認仍面臨的挑戰，並呼籲利害關係人共同參與轉型旅程。使用「我們」和「本公司」，保持溫暖且專業的語調，避免元評論。\n\n公司背景：公司營運於 General Industry 產業。 推估年營收：0萬(0) NTD。 公司規模：Unknown。\n\n關鍵法規挑戰：No policy and regulation data available.'}], 'model': 'claude-3-5-sonnet-20241022'}}
+2025-12-24 09:57:47,000 - anthropic._base_client - DEBUG - Sending HTTP Request: POST https://api.anthropic.com/v1/messages
+2025-12-24 09:57:47,000 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-12-24 09:57:47,001 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:57:47,001 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-12-24 09:57:47,001 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:57:47,002 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-12-24 09:57:47,203 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:57:48 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgZrJ4Le754xqQ1nDeL'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'20'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7d6fd96e8f24-TPE')])
+2025-12-24 09:57:47,204 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:57:47,204 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-12-24 09:57:47,204 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:57:47,205 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:57:47,205 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:57:47,206 - anthropic._base_client - DEBUG - HTTP Response: POST https://api.anthropic.com/v1/messages "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:57:48 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgZrJ4Le754xqQ1nDeL', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '20', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7d6fd96e8f24-TPE'})
+2025-12-24 09:57:47,206 - anthropic._base_client - DEBUG - request_id: req_011CWQgZrJ4Le754xqQ1nDeL
+2025-12-24 09:57:47,206 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/messages'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:57:47,207 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:57:47,209 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:57:47,210 - company_engine_wrapper_zh - ERROR - 生成公司段失敗: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgZrJ4Le754xqQ1nDeL'}
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\company_engine_wrapper_zh.py", line 101, in generate_company_section_zh
+    output_path = ppt_engine.generate(company_name=company_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 78, in generate
+    self._generate_slide(idx)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 128, in _generate_slide
+    self._layout_a(slide, cfg)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 182, in _layout_a
+    text = self._get_slide_text(cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 619, in _get_slide_text
+    text = getattr(self.content_engine, method_name)()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 266, in generate_ceo_message
+    return self._call(prompt, word_count=220, is_chinese=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 74, in _call
+    response = self.client.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_utils\_utils.py", line 282, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\resources\messages\messages.py", line 930, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1326, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1114, in request
+    raise self._make_status_error_from_response(err.response) from None
+anthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgZrJ4Le754xqQ1nDeL'}
+
+2025-12-24 09:57:47,211 - company_engine_wrapper_zh - INFO - 環境狀態恢復完成
+2025-12-24 09:57:47,264 - httpcore.connection - DEBUG - close.started
+2025-12-24 09:57:47,265 - httpcore.connection - DEBUG - close.complete
+2025-12-24 09:57:47,266 - httpcore.connection - DEBUG - close.started
+2025-12-24 09:57:47,266 - httpcore.connection - DEBUG - close.complete
+2025-12-24 09:59:22,198 - company_engine_wrapper_zh - ERROR - API Key 驗證失敗：API Key 不能為空
+2025-12-24 09:59:22,200 - company_engine_wrapper_zh - ERROR - API Key 驗證失敗：API Key 不能為空
+2025-12-24 09:59:22,201 - company_engine_wrapper_zh - WARNING - API Key 格式可能不正確（應以 sk-ant- 開頭）
+2025-12-24 09:59:22,202 - company_engine_wrapper_zh - INFO - 開始生成公司段 PPTX
+2025-12-24 09:59:22,204 - company_engine_wrapper_zh - INFO - 載入公司段引擎: C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6
+2025-12-24 09:59:23,875 - company_engine_wrapper_zh - INFO - 初始化內容引擎...
+2025-12-24 09:59:24,506 - anthropic._base_client - DEBUG - Request options: {'method': 'get', 'url': '/v1/models', 'params': {}, 'headers': {}, 'post_parser': <function SyncAPIClient._request_api_list.<locals>._parser at 0x0000018140B93EC0>, 'json_data': None}
+2025-12-24 09:59:24,546 - anthropic._base_client - DEBUG - Sending HTTP Request: GET https://api.anthropic.com/v1/models
+2025-12-24 09:59:24,546 - httpcore.connection - DEBUG - connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=5.0 socket_options=[(65535, 8, True), (6, 17, 60), (6, 16, 5), (6, 3, 60)]
+2025-12-24 09:59:24,583 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018140BAB8D0>
+2025-12-24 09:59:24,584 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000018140B6D520> server_hostname='api.anthropic.com' timeout=5.0
+2025-12-24 09:59:24,595 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018140566F90>
+2025-12-24 09:59:24,596 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:24,597 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:24,598 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-12-24 09:59:24,599 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:24,599 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:24,857 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:25 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgh3ZvF7McfmCrpbRWX'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'46'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fd1dd6b4a36-TPE')])
+2025-12-24 09:59:24,859 - httpx - INFO - HTTP Request: GET https://api.anthropic.com/v1/models "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:24,859 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-12-24 09:59:24,860 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:24,860 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:24,861 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:24,861 - anthropic._base_client - DEBUG - HTTP Response: GET https://api.anthropic.com/v1/models "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:25 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgh3ZvF7McfmCrpbRWX', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '46', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fd1dd6b4a36-TPE'})
+2025-12-24 09:59:24,861 - anthropic._base_client - DEBUG - request_id: req_011CWQgh3ZvF7McfmCrpbRWX
+2025-12-24 09:59:24,862 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/models'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:24,866 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:24,866 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:24,879 - company_engine_wrapper_zh - INFO - 初始化 PPT 引擎...
+2025-12-24 09:59:24,892 - company_engine_wrapper_zh - INFO - 開始生成 PPTX...
+2025-12-24 09:59:24,922 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:24,922 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:24,923 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:24,923 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:24,924 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:24,924 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:24,924 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:24,925 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:24,925 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:24,925 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:24,926 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:24,926 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:24,931 - anthropic._base_client - DEBUG - Request options: {'method': 'post', 'url': '/v1/messages', 'timeout': Timeout(connect=5.0, read=600, write=600, pool=600), 'files': None, 'idempotency_key': 'stainless-python-retry-56443ab5-458d-498b-a576-6466b9cd6aa8', 'json_data': {'max_tokens': 1100, 'messages': [{'role': 'user', 'content': '請用繁體中文撰寫約 330 字（對應 220 英文單字）。\n\n請撰寫約 330 字（對應 220 英文單字）的 CEO 訊息，用於 ESG 永續報告書。平衡啟發性與責任感：歡迎讀者、概述永續願景、強調近期 ESG 成就、承認仍面臨的挑戰，並呼籲利害關係人共同參與轉型旅程。使用「我們」和「本公司」，保持溫暖且專業的語調，避免元評論。\n\n公司背景：公司營運於 General Industry 產業。 推估年營收：0萬(0) NTD。 公司規模：Unknown。\n\n關鍵法規挑戰：No policy and regulation data available.'}], 'model': 'claude-3-5-sonnet-20241022'}}
+2025-12-24 09:59:24,933 - anthropic._base_client - DEBUG - Sending HTTP Request: POST https://api.anthropic.com/v1/messages
+2025-12-24 09:59:24,933 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:24,934 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:24,934 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-12-24 09:59:24,935 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:24,935 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:25,131 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:26 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgh4zzYn7n5fr5p5hbQ'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'14'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fd3ff214a36-TPE')])
+2025-12-24 09:59:25,132 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:25,133 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-12-24 09:59:25,133 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:25,134 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:25,134 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:25,135 - anthropic._base_client - DEBUG - HTTP Response: POST https://api.anthropic.com/v1/messages "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:26 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgh4zzYn7n5fr5p5hbQ', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '14', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fd3ff214a36-TPE'})
+2025-12-24 09:59:25,135 - anthropic._base_client - DEBUG - request_id: req_011CWQgh4zzYn7n5fr5p5hbQ
+2025-12-24 09:59:25,136 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/messages'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:25,137 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:25,138 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:25,144 - company_engine_wrapper_zh - ERROR - 生成公司段失敗: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgh4zzYn7n5fr5p5hbQ'}
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\company_engine_wrapper_zh.py", line 101, in generate_company_section_zh
+    output_path = ppt_engine.generate(company_name=company_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 78, in generate
+    self._generate_slide(idx)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 128, in _generate_slide
+    self._layout_a(slide, cfg)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 182, in _layout_a
+    text = self._get_slide_text(cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 619, in _get_slide_text
+    text = getattr(self.content_engine, method_name)()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 266, in generate_ceo_message
+    return self._call(prompt, word_count=220, is_chinese=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 74, in _call
+    response = self.client.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_utils\_utils.py", line 282, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\resources\messages\messages.py", line 930, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1326, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1114, in request
+    raise self._make_status_error_from_response(err.response) from None
+anthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgh4zzYn7n5fr5p5hbQ'}
+
+2025-12-24 09:59:25,145 - company_engine_wrapper_zh - INFO - 環境狀態恢復完成
+2025-12-24 09:59:25,148 - company_engine_wrapper_zh - INFO - 開始生成公司段 PPTX
+2025-12-24 09:59:25,149 - company_engine_wrapper_zh - INFO - 載入公司段引擎: C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6
+2025-12-24 09:59:25,150 - company_engine_wrapper_zh - INFO - 初始化內容引擎...
+2025-12-24 09:59:25,732 - anthropic._base_client - DEBUG - Request options: {'method': 'get', 'url': '/v1/models', 'params': {}, 'headers': {}, 'post_parser': <function SyncAPIClient._request_api_list.<locals>._parser at 0x000001814222ACA0>, 'json_data': None}
+2025-12-24 09:59:25,733 - anthropic._base_client - DEBUG - Sending HTTP Request: GET https://api.anthropic.com/v1/models
+2025-12-24 09:59:25,734 - httpcore.connection - DEBUG - connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=5.0 socket_options=[(65535, 8, True), (6, 17, 60), (6, 16, 5), (6, 3, 60)]
+2025-12-24 09:59:25,758 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018142272790>
+2025-12-24 09:59:25,758 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000018140BEB380> server_hostname='api.anthropic.com' timeout=5.0
+2025-12-24 09:59:25,769 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018142272750>
+2025-12-24 09:59:25,769 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:25,770 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:25,770 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-12-24 09:59:25,771 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:25,771 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:25,965 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:27 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgh8aJGQSzsz6FA9kb9'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'11'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fd92d3b8410-TPE')])
+2025-12-24 09:59:25,966 - httpx - INFO - HTTP Request: GET https://api.anthropic.com/v1/models "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:25,966 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-12-24 09:59:25,967 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:25,967 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:25,968 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:25,968 - anthropic._base_client - DEBUG - HTTP Response: GET https://api.anthropic.com/v1/models "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:27 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgh8aJGQSzsz6FA9kb9', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '11', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fd92d3b8410-TPE'})
+2025-12-24 09:59:25,969 - anthropic._base_client - DEBUG - request_id: req_011CWQgh8aJGQSzsz6FA9kb9
+2025-12-24 09:59:25,970 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/models'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:25,971 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:25,971 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:25,984 - company_engine_wrapper_zh - INFO - 初始化 PPT 引擎...
+2025-12-24 09:59:25,994 - company_engine_wrapper_zh - INFO - 開始生成 PPTX...
+2025-12-24 09:59:26,001 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:26,002 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:26,002 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:26,003 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:26,004 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:26,004 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:26,004 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:26,005 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:26,005 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:26,006 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:26,006 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:26,007 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:26,010 - anthropic._base_client - DEBUG - Request options: {'method': 'post', 'url': '/v1/messages', 'timeout': Timeout(connect=5.0, read=600, write=600, pool=600), 'files': None, 'idempotency_key': 'stainless-python-retry-b7471813-1e37-4b52-bfb2-a25bb91c3045', 'json_data': {'max_tokens': 1100, 'messages': [{'role': 'user', 'content': '請用繁體中文撰寫約 330 字（對應 220 英文單字）。\n\n請撰寫約 330 字（對應 220 英文單字）的 CEO 訊息，用於 ESG 永續報告書。平衡啟發性與責任感：歡迎讀者、概述永續願景、強調近期 ESG 成就、承認仍面臨的挑戰，並呼籲利害關係人共同參與轉型旅程。使用「我們」和「本公司」，保持溫暖且專業的語調，避免元評論。\n\n公司背景：公司營運於 General Industry 產業。 推估年營收：0萬(0) NTD。 公司規模：Unknown。\n\n關鍵法規挑戰：No policy and regulation data available.'}], 'model': 'claude-3-5-sonnet-20241022'}}
+2025-12-24 09:59:26,011 - anthropic._base_client - DEBUG - Sending HTTP Request: POST https://api.anthropic.com/v1/messages
+2025-12-24 09:59:26,012 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:26,012 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:26,013 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-12-24 09:59:26,013 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:26,014 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:26,291 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:27 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQgh9do9TxQPwJvcvRRD'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'94'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fdabe748410-TPE')])
+2025-12-24 09:59:26,292 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:26,293 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-12-24 09:59:26,297 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:26,297 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:26,298 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:26,299 - anthropic._base_client - DEBUG - HTTP Response: POST https://api.anthropic.com/v1/messages "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:27 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQgh9do9TxQPwJvcvRRD', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '94', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fdabe748410-TPE'})
+2025-12-24 09:59:26,300 - anthropic._base_client - DEBUG - request_id: req_011CWQgh9do9TxQPwJvcvRRD
+2025-12-24 09:59:26,300 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/messages'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:26,302 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:26,302 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:26,305 - company_engine_wrapper_zh - ERROR - 生成公司段失敗: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgh9do9TxQPwJvcvRRD'}
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\company_engine_wrapper_zh.py", line 101, in generate_company_section_zh
+    output_path = ppt_engine.generate(company_name=company_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 78, in generate
+    self._generate_slide(idx)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 128, in _generate_slide
+    self._layout_a(slide, cfg)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 182, in _layout_a
+    text = self._get_slide_text(cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 619, in _get_slide_text
+    text = getattr(self.content_engine, method_name)()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 266, in generate_ceo_message
+    return self._call(prompt, word_count=220, is_chinese=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 74, in _call
+    response = self.client.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_utils\_utils.py", line 282, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\resources\messages\messages.py", line 930, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1326, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1114, in request
+    raise self._make_status_error_from_response(err.response) from None
+anthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQgh9do9TxQPwJvcvRRD'}
+
+2025-12-24 09:59:26,306 - company_engine_wrapper_zh - INFO - 環境狀態恢復完成
+2025-12-24 09:59:26,344 - company_engine_wrapper_zh - INFO - 開始生成公司段 PPTX
+2025-12-24 09:59:26,344 - company_engine_wrapper_zh - INFO - 載入公司段引擎: C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6
+2025-12-24 09:59:26,345 - company_engine_wrapper_zh - INFO - 初始化內容引擎...
+2025-12-24 09:59:26,916 - anthropic._base_client - DEBUG - Request options: {'method': 'get', 'url': '/v1/models', 'params': {}, 'headers': {}, 'post_parser': <function SyncAPIClient._request_api_list.<locals>._parser at 0x0000018140B93EC0>, 'json_data': None}
+2025-12-24 09:59:26,916 - anthropic._base_client - DEBUG - Sending HTTP Request: GET https://api.anthropic.com/v1/models
+2025-12-24 09:59:26,918 - httpcore.connection - DEBUG - connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=5.0 socket_options=[(65535, 8, True), (6, 17, 60), (6, 16, 5), (6, 3, 60)]
+2025-12-24 09:59:26,945 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018142204FD0>
+2025-12-24 09:59:26,945 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000018142269520> server_hostname='api.anthropic.com' timeout=5.0
+2025-12-24 09:59:26,968 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018142204610>
+2025-12-24 09:59:26,968 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:26,969 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:26,969 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-12-24 09:59:26,970 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:26,970 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:27,191 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:28 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQghDhcyHdvh2u49Z997'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'40'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fe0ad918f06-TPE')])
+2025-12-24 09:59:27,192 - httpx - INFO - HTTP Request: GET https://api.anthropic.com/v1/models "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:27,192 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-12-24 09:59:27,192 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:27,193 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:27,193 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:27,193 - anthropic._base_client - DEBUG - HTTP Response: GET https://api.anthropic.com/v1/models "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:28 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQghDhcyHdvh2u49Z997', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '40', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fe0ad918f06-TPE'})
+2025-12-24 09:59:27,194 - anthropic._base_client - DEBUG - request_id: req_011CWQghDhcyHdvh2u49Z997
+2025-12-24 09:59:27,194 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/models'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:27,195 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:27,195 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:27,204 - company_engine_wrapper_zh - INFO - 初始化 PPT 引擎...
+2025-12-24 09:59:27,215 - company_engine_wrapper_zh - INFO - 開始生成 PPTX...
+2025-12-24 09:59:27,221 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:27,221 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:27,222 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:27,222 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:27,223 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:27,223 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:27,223 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:27,224 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:27,224 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:27,225 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 58913
+2025-12-24 09:59:27,225 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 58913 (unknown)
+2025-12-24 09:59:27,225 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 58966 65536
+2025-12-24 09:59:27,229 - anthropic._base_client - DEBUG - Request options: {'method': 'post', 'url': '/v1/messages', 'timeout': Timeout(connect=5.0, read=600, write=600, pool=600), 'files': None, 'idempotency_key': 'stainless-python-retry-9786a580-a218-429f-8a70-a3503490fac1', 'json_data': {'max_tokens': 1100, 'messages': [{'role': 'user', 'content': '請用繁體中文撰寫約 330 字（對應 220 英文單字）。\n\n請撰寫約 330 字（對應 220 英文單字）的 CEO 訊息，用於 ESG 永續報告書。平衡啟發性與責任感：歡迎讀者、概述永續願景、強調近期 ESG 成就、承認仍面臨的挑戰，並呼籲利害關係人共同參與轉型旅程。使用「我們」和「本公司」，保持溫暖且專業的語調，避免元評論。\n\n公司背景：公司營運於 General Industry 產業。 推估年營收：0萬(0) NTD。 公司規模：Unknown。\n\n關鍵法規挑戰：No policy and regulation data available.'}], 'model': 'claude-3-5-sonnet-20241022'}}
+2025-12-24 09:59:27,230 - anthropic._base_client - DEBUG - Sending HTTP Request: POST https://api.anthropic.com/v1/messages
+2025-12-24 09:59:27,231 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:27,232 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:27,232 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-12-24 09:59:27,233 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:27,234 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:27,430 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:28 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQghEqajxuqsaiswTVVp'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'14'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fe25f398f06-TPE')])
+2025-12-24 09:59:27,431 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:27,432 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-12-24 09:59:27,433 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:27,433 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:27,434 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:27,434 - anthropic._base_client - DEBUG - HTTP Response: POST https://api.anthropic.com/v1/messages "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:28 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQghEqajxuqsaiswTVVp', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '14', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fe25f398f06-TPE'})
+2025-12-24 09:59:27,435 - anthropic._base_client - DEBUG - request_id: req_011CWQghEqajxuqsaiswTVVp
+2025-12-24 09:59:27,436 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/messages'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:27,437 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:27,437 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:27,440 - company_engine_wrapper_zh - ERROR - 生成公司段失敗: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQghEqajxuqsaiswTVVp'}
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\company_engine_wrapper_zh.py", line 101, in generate_company_section_zh
+    output_path = ppt_engine.generate(company_name=company_name)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 78, in generate
+    self._generate_slide(idx)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 128, in _generate_slide
+    self._layout_a(slide, cfg)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 182, in _layout_a
+    text = self._get_slide_text(cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\full_pptx_company.py", line 619, in _get_slide_text
+    text = getattr(self.content_engine, method_name)()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 266, in generate_ceo_message
+    return self._call(prompt, word_count=220, is_chinese=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\content_pptx_company.py", line 74, in _call
+    response = self.client.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_utils\_utils.py", line 282, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\resources\messages\messages.py", line 930, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1326, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1114, in request
+    raise self._make_status_error_from_response(err.response) from None
+anthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQghEqajxuqsaiswTVVp'}
+
+2025-12-24 09:59:27,442 - company_engine_wrapper_zh - INFO - 環境狀態恢復完成
+2025-12-24 09:59:27,452 - govsoci_engine_wrapper_zh - ERROR - API Key 驗證失敗：API Key 不能為空
+2025-12-24 09:59:27,453 - govsoci_engine_wrapper_zh - INFO - 開始生成治理與社會段 PPTX
+2025-12-24 09:59:27,454 - govsoci_engine_wrapper_zh - INFO - 載入治理與社會段引擎: C:\Users\User\Desktop\ESG report\ESG--report\GovSoci5.1-6.9
+2025-12-24 09:59:27,466 - govsoci_engine_wrapper_zh - INFO - 初始化內容引擎...
+2025-12-24 09:59:28,091 - anthropic._base_client - DEBUG - Request options: {'method': 'get', 'url': '/v1/models', 'params': {}, 'headers': {}, 'post_parser': <function SyncAPIClient._request_api_list.<locals>._parser at 0x00000181422A4540>, 'json_data': None}
+2025-12-24 09:59:28,092 - anthropic._base_client - DEBUG - Sending HTTP Request: GET https://api.anthropic.com/v1/models
+2025-12-24 09:59:28,092 - httpcore.connection - DEBUG - connect_tcp.started host='api.anthropic.com' port=443 local_address=None timeout=5.0 socket_options=[(65535, 8, True), (6, 17, 60), (6, 16, 5), (6, 3, 60)]
+2025-12-24 09:59:28,098 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018142294AD0>
+2025-12-24 09:59:28,099 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x000001814226A9F0> server_hostname='api.anthropic.com' timeout=5.0
+2025-12-24 09:59:28,111 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000018142294A10>
+2025-12-24 09:59:28,111 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:28,112 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:28,112 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-12-24 09:59:28,113 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:28,113 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-12-24 09:59:28,347 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:29 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQghJcHwhxqQhj8JNHBE'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'52'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fe7cfffa35b-TPE')])
+2025-12-24 09:59:28,348 - httpx - INFO - HTTP Request: GET https://api.anthropic.com/v1/models "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:28,349 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-12-24 09:59:28,350 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:28,350 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:28,351 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:28,351 - anthropic._base_client - DEBUG - HTTP Response: GET https://api.anthropic.com/v1/models "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:29 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQghJcHwhxqQhj8JNHBE', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '52', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fe7cfffa35b-TPE'})
+2025-12-24 09:59:28,352 - anthropic._base_client - DEBUG - request_id: req_011CWQghJcHwhxqQhj8JNHBE
+2025-12-24 09:59:28,352 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/models'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:28,353 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:28,354 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:28,367 - govsoci_engine_wrapper_zh - INFO - 初始化 PPT 引擎...
+2025-12-24 09:59:28,388 - govsoci_engine_wrapper_zh - INFO - 開始生成 PPTX...
+2025-12-24 09:59:28,395 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:28,396 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 43660
+2025-12-24 09:59:28,396 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 43660 (unknown)
+2025-12-24 09:59:28,397 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 43713 65536
+2025-12-24 09:59:28,399 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:28,399 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 43660
+2025-12-24 09:59:28,400 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 43660 (unknown)
+2025-12-24 09:59:28,400 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 43713 65536
+2025-12-24 09:59:28,401 - PIL.PngImagePlugin - DEBUG - STREAM b'IHDR' 16 13
+2025-12-24 09:59:28,401 - PIL.PngImagePlugin - DEBUG - STREAM b'caBX' 41 43660
+2025-12-24 09:59:28,401 - PIL.PngImagePlugin - DEBUG - b'caBX' 41 43660 (unknown)
+2025-12-24 09:59:28,402 - PIL.PngImagePlugin - DEBUG - STREAM b'IDAT' 43713 65536
+2025-12-24 09:59:28,408 - anthropic._base_client - DEBUG - Request options: {'method': 'post', 'url': '/v1/messages', 'timeout': Timeout(connect=5.0, read=600, write=600, pool=600), 'files': None, 'idempotency_key': 'stainless-python-retry-cd20dae1-78ee-484e-97c0-a3bb5604c6c3', 'json_data': {'max_tokens': 1400, 'messages': [{'role': 'user', 'content': '請用繁體中文撰寫約 420 字（對應 280 英文單字）。\n\n你是一位資深的 ESG 顧問和General Industry產業分析專家。請為一家General Industry公司撰寫約 420 字（對應 280 英文單字）的治理結構概述，用於 ESG 報告。必須緊扣General Industry產業的治理特色，描述治理架構、董事會組成、監督節奏和利害關係人溝通。使用高階主管語調，保持專業且易於理解。\n\n公司背景：公司營運於 General Industry 產業。 推估年營收：0萬(0) NTD。 公司規模：Unknown。'}], 'model': 'claude-3-5-sonnet-20241022'}}
+2025-12-24 09:59:28,409 - anthropic._base_client - DEBUG - Sending HTTP Request: POST https://api.anthropic.com/v1/messages
+2025-12-24 09:59:28,409 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:28,410 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-12-24 09:59:28,410 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-12-24 09:59:28,410 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-12-24 09:59:28,411 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-12-24 09:59:28,660 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 401, b'Unauthorized', [(b'Date', b'Wed, 24 Dec 2025 01:59:29 GMT'), (b'Content-Type', b'application/json'), (b'Content-Length', b'130'), (b'Connection', b'keep-alive'), (b'x-should-retry', b'false'), (b'request-id', b'req_011CWQghKuBXMPnpUd9fgYxT'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains; preload'), (b'Server', b'cloudflare'), (b'x-envoy-upstream-service-time', b'69'), (b'cf-cache-status', b'DYNAMIC'), (b'X-Robots-Tag', b'none'), (b'CF-RAY', b'9b2c7fe9aa0da35b-TPE')])
+2025-12-24 09:59:28,661 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 401 Unauthorized"
+2025-12-24 09:59:28,662 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-12-24 09:59:28,662 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-12-24 09:59:28,663 - httpcore.http11 - DEBUG - response_closed.started
+2025-12-24 09:59:28,664 - httpcore.http11 - DEBUG - response_closed.complete
+2025-12-24 09:59:28,664 - anthropic._base_client - DEBUG - HTTP Response: POST https://api.anthropic.com/v1/messages "401 Unauthorized" Headers({'date': 'Wed, 24 Dec 2025 01:59:29 GMT', 'content-type': 'application/json', 'content-length': '130', 'connection': 'keep-alive', 'x-should-retry': 'false', 'request-id': 'req_011CWQghKuBXMPnpUd9fgYxT', 'strict-transport-security': 'max-age=31536000; includeSubDomains; preload', 'server': 'cloudflare', 'x-envoy-upstream-service-time': '69', 'cf-cache-status': 'DYNAMIC', 'x-robots-tag': 'none', 'cf-ray': '9b2c7fe9aa0da35b-TPE'})
+2025-12-24 09:59:28,665 - anthropic._base_client - DEBUG - request_id: req_011CWQghKuBXMPnpUd9fgYxT
+2025-12-24 09:59:28,666 - anthropic._base_client - DEBUG - Encountered httpx.HTTPStatusError
+Traceback (most recent call last):
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1094, in request
+    response.raise_for_status()
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\httpx\_models.py", line 829, in raise_for_status
+    raise HTTPStatusError(message, request=request, response=self)
+httpx.HTTPStatusError: Client error '401 Unauthorized' for url 'https://api.anthropic.com/v1/messages'
+For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
+2025-12-24 09:59:28,667 - anthropic._base_client - DEBUG - Not retrying as header `x-should-retry` is set to `false`
+2025-12-24 09:59:28,668 - anthropic._base_client - DEBUG - Re-raising status error
+2025-12-24 09:59:28,671 - govsoci_engine_wrapper_zh - ERROR - 生成治理社會段失敗: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQghKuBXMPnpUd9fgYxT'}
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\govsoci_engine_wrapper_zh.py", line 98, in generate_govsoci_section_zh
+    output_path = ppt_engine.generate()
+                  ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\GovSoci5.1-6.9\full_pptx.py", line 110, in generate
+    self._generate_slide(idx)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\GovSoci5.1-6.9\full_pptx.py", line 151, in _generate_slide
+    self._layout_a(slide, cfg)
+  File "C:\Users\User\Desktop\ESG report\ESG--report\GovSoci5.1-6.9\full_pptx.py", line 223, in _layout_a
+    text = self._get_slide_text(cfg)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\GovSoci5.1-6.9\full_pptx.py", line 775, in _get_slide_text
+    return getattr(self.content_engine, method_name)()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\GovSoci5.1-6.9\content_pptx.py", line 141, in generate_governance_overview
+    return self._call(prompt, word_count=280, is_chinese=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\ESG report\ESG--report\GovSoci5.1-6.9\content_pptx.py", line 65, in _call
+    response = self.client.messages.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_utils\_utils.py", line 282, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\resources\messages\messages.py", line 930, in create
+    return self._post(
+           ^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1326, in post
+    return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Roaming\Python\Python311\site-packages\anthropic\_base_client.py", line 1114, in request
+    raise self._make_status_error_from_response(err.response) from None
+anthropic.AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': 'req_011CWQghKuBXMPnpUd9fgYxT'}
+
+2025-12-24 09:59:28,673 - govsoci_engine_wrapper_zh - INFO - 環境狀態恢復完成
+2025-12-24 09:59:28,717 - httpcore.connection - DEBUG - close.started
+2025-12-24 09:59:28,718 - httpcore.connection - DEBUG - close.complete
+2025-12-24 09:59:28,718 - httpcore.connection - DEBUG - close.started
+2025-12-24 09:59:28,719 - httpcore.connection - DEBUG - close.complete
+2025-12-24 09:59:28,719 - httpcore.connection - DEBUG - close.started
+2025-12-24 09:59:28,720 - httpcore.connection - DEBUG - close.complete
+2025-12-24 09:59:28,720 - httpcore.connection - DEBUG - close.started
+2025-12-24 09:59:28,721 - httpcore.connection - DEBUG - close.complete
