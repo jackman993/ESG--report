@@ -97,17 +97,20 @@ class PPTContentEngine:
         else:
             content = f"Respond in English with exactly {word_count} words.\n\n{prompt}"
         
-        # 調試信息：檢查 prompt 中是否包含產業別
+        # 在實際發送給 LLM 之前，檢查 prompt 是否包含產業別
         industry = self.env_context.get("industry", "")
+        print(f"[DEBUG] _call: 準備發送 prompt 給 LLM")
+        print(f"[DEBUG] _call: industry={repr(industry)}")
+        print(f"[DEBUG] _call: prompt 長度={len(prompt)}")
+        print(f"[DEBUG] _call: prompt 前 500 字: {prompt[:500]}")
         if industry:
             if industry in prompt:
-                print(f"[DEBUG] _call: 產業別 '{industry}' 已包含在 prompt 中")
+                print(f"[OK] _call: 產業別 '{industry}' 已包含在 prompt 中")
             else:
-                print(f"[WARN] _call: 產業別 '{industry}' 存在，但未包含在 prompt 中")
-                print(f"[DEBUG] Prompt preview (first 200 chars): {prompt[:200]}")
+                print(f"[ERROR] _call: 產業別 '{industry}' 未包含在 prompt 中！")
+                print(f"[ERROR] _call: 這表示 prompt 構建有問題")
         else:
             print(f"[WARN] _call: 產業別為空，無法包含在 prompt 中")
-            print(f"[DEBUG] Prompt preview (first 200 chars): {prompt[:200]}")
         
         response = self.client.messages.create(
             model=self.model,
@@ -187,7 +190,11 @@ class PPTContentEngine:
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫高階主管級別的敘述，描述治理結構、董事會組成、監督節奏和利害關係人溝通。"
         
-        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、相關法律合規、市場衝擊，並在內容中明確提及與產業相關的法規、風險和治理要求。"
+        if industry:
+            prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，並在內容中明確提及{industry}產業相關的法規、風險和治理要求。"
+            prompt += f"內容必須緊扣{industry}產業的特性，確保與{industry}產業緊密相關。"
+        else:
+            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，並在內容中明確提及與產業相關的法規、風險和治理要求。"
         
         return self._call(prompt, is_chinese=True)
 
@@ -203,7 +210,11 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請總結公司如何維持與法規的對齊、協調合規利害關係人，以及升級法律風險。"
-        prompt += f"\n\n【重要】請根據本公司產業，分析相關法律合規，並說明如何維持與產業特定的環境法規、財務合規要求的對齊。"
+        
+        if industry:
+            prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析相關法律合規，並說明如何維持與{industry}產業特定的環境法規、財務合規要求的對齊。"
+        else:
+            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析相關法律合規，並說明如何維持與產業特定的環境法規、財務合規要求的對齊。"
         
         return self._call(prompt, is_chinese=True)
 
@@ -214,7 +225,11 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請說明法律遵循計畫，強調框架、審計追蹤、內部控制和對治理的益處。"
-        prompt += f"\n\n【重要】請根據本公司產業，分析相關法律合規，並說明法律遵循計畫如何應對產業特定的環境法規、財務合規框架、審計追蹤和內部控制要求。"
+        
+        if industry:
+            prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析相關法律合規，並說明法律遵循計畫如何應對{industry}產業特定的環境法規、財務合規框架、審計追蹤和內部控制要求。"
+        else:
+            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析相關法律合規，並說明法律遵循計畫如何應對產業特定的環境法規、財務合規框架、審計追蹤和內部控制要求。"
         
         return self._call(prompt, is_chinese=True)
 
@@ -239,7 +254,11 @@ class PPTContentEngine:
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請總結員工健康、安全和福祉治理，參考 ISO 45001 和 ISO 45003。"
         prompt += "涵蓋危害識別、心理健康資源、職業健康投資、參與機制和成功指標。"
-        prompt += f"\n\n【重要】請根據本公司產業，分析員工勞安衛（勞動安全衛生），並說明產業特定的職業健康與安全要求、危害識別流程、安全協議和適用於產業工作者的健康法規。"
+        
+        if industry:
+            prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析員工勞安衛（勞動安全衛生），並說明{industry}產業特定的職業健康與安全要求、危害識別流程、安全協議和適用於{industry}產業工作者的健康法規。"
+        else:
+            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析員工勞安衛（勞動安全衛生），並說明產業特定的職業健康與安全要求、危害識別流程、安全協議和適用於產業工作者的健康法規。"
         
         return self._call(prompt, word_count=240, is_chinese=True)
 
@@ -277,7 +296,11 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請為社會行動計畫表格提供敘述性背景，概述優先順序邏輯、負責人、進度追蹤、利害關係人回饋循環，以及已完成的倡議如何為下一波承諾提供資訊。"
-        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、市場衝擊，並概述社會行動計畫如何應對與產業相關的環境影響和社會責任，包括產業特定的環境挑戰和緩解策略。"
+        
+        if industry:
+            prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析關係人、市場衝擊，並概述社會行動計畫如何應對與{industry}產業相關的環境影響和社會責任，包括{industry}產業特定的環境挑戰和緩解策略。"
+        else:
+            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、市場衝擊，並概述社會行動計畫如何應對與產業相關的環境影響和社會責任，包括產業特定的環境挑戰和緩解策略。"
         
         return self._call(prompt, word_count=220, is_chinese=True)
 
@@ -356,11 +379,25 @@ class PPTContentEngine:
         industry = self.env_context.get("industry", "")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
+        # 調試信息：確認產業別是否正確獲取
+        print(f"[DEBUG] generate_cooperation_info: industry={repr(industry)}, company_name={repr(company_name)}")
+        print(f"[DEBUG] generate_cooperation_info: env_context keys={list(self.env_context.keys())}")
+        if not industry:
+            print(f"[ERROR] generate_cooperation_info: 產業別為空！env_context.industry={repr(self.env_context.get('industry'))}")
+            if self.env_log_data:
+                print(f"[DEBUG] generate_cooperation_info: env_log_data.industry={repr(self.env_log_data.get('industry', 'NOT FOUND'))}")
+        
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
         prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
         prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
-        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+        
+        if industry:
+            prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+            prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
+        else:
+            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+        
         prompt += "總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
