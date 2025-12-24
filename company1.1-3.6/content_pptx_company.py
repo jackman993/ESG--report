@@ -180,16 +180,14 @@ class PPTContentEngine:
         # 調試信息
         print(f"[DEBUG] generate_governance_overview: industry={repr(industry)}, company_name={repr(company_name)}")
         
+        if not industry:
+            print(f"[ERROR] generate_governance_overview: 產業別為空！env_context keys: {list(self.env_context.keys())}")
+            print(f"[DEBUG] env_log_data industry: {self.env_log_data.get('industry', 'NOT FOUND') if self.env_log_data else 'env_log_data is None'}")
+        
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫高階主管級別的敘述，描述治理結構、董事會組成、監督節奏和利害關係人溝通。"
         
-        if industry:
-            prompt += f"\n\n必須依據{industry}產業的性質，提出相關的環境、財務法規遵循。"
-            prompt += f"描述治理結構和監督機制，以應對{industry}產業特定的環境法規、財務合規要求和適用的監管框架。"
-        else:
-            prompt += f"\n\n必須依據公司所屬產業的性質，提出相關的環境、財務法規遵循。"
-            prompt += f"描述治理結構和監督機制，以應對產業特定的環境法規、財務合規要求和適用的監管框架。"
-            print(f"[WARN] generate_governance_overview: 產業別為空，使用通用描述")
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、相關法律合規、市場衝擊，並在內容中明確提及與產業相關的法規、風險和治理要求。"
         
         return self._call(prompt, is_chinese=True)
 
@@ -205,10 +203,7 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請總結公司如何維持與法規的對齊、協調合規利害關係人，以及升級法律風險。"
-        
-        if industry:
-            prompt += f"\n\n必須依據{industry}產業的性質，提出相關的環境、財務法規遵循。"
-            prompt += f"總結公司如何維持與{industry}產業特定的環境法規、財務合規要求的對齊，並協調與{industry}產業相關的合規利害關係人。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析相關法律合規，並說明如何維持與產業特定的環境法規、財務合規要求的對齊。"
         
         return self._call(prompt, is_chinese=True)
 
@@ -219,10 +214,7 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請說明法律遵循計畫，強調框架、審計追蹤、內部控制和對治理的益處。"
-        
-        if industry:
-            prompt += f"\n\n必須依據{industry}產業的性質，提出相關的環境、財務法規遵循。"
-            prompt += f"說明法律遵循計畫，以應對{industry}產業特定的環境法規、財務合規框架、審計追蹤和適用於{industry}產業的內部控制。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析相關法律合規，並說明法律遵循計畫如何應對產業特定的環境法規、財務合規框架、審計追蹤和內部控制要求。"
         
         return self._call(prompt, is_chinese=True)
 
@@ -247,10 +239,7 @@ class PPTContentEngine:
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請總結員工健康、安全和福祉治理，參考 ISO 45001 和 ISO 45003。"
         prompt += "涵蓋危害識別、心理健康資源、職業健康投資、參與機制和成功指標。"
-        
-        if industry:
-            prompt += f"\n\n必須針對{industry}產業勞工的安全、衛生法規。"
-            prompt += f"總結{industry}產業特定的職業健康與安全要求、危害識別流程、安全協議和適用於{industry}產業工作者的健康法規。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析員工勞安衛（勞動安全衛生），並說明產業特定的職業健康與安全要求、危害識別流程、安全協議和適用於產業工作者的健康法規。"
         
         return self._call(prompt, word_count=240, is_chinese=True)
 
@@ -288,10 +277,7 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請為社會行動計畫表格提供敘述性背景，概述優先順序邏輯、負責人、進度追蹤、利害關係人回饋循環，以及已完成的倡議如何為下一波承諾提供資訊。"
-        
-        if industry:
-            prompt += f"\n\n必須針對{industry}產業可能造成的環境影響。"
-            prompt += f"概述社會行動計畫，以應對與{industry}產業相關的環境影響和社會責任，包括{industry}產業特定的環境挑戰和緩解策略。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、市場衝擊，並概述社會行動計畫如何應對與產業相關的環境影響和社會責任，包括產業特定的環境挑戰和緩解策略。"
         
         return self._call(prompt, word_count=220, is_chinese=True)
 
@@ -316,10 +302,7 @@ class PPTContentEngine:
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請描述公司的產品責任計畫，參考 ISO 9001、ISO 10377 和 ISO 26000 消費者議題（6.7）。"
         prompt += "涵蓋品質設計控制、客戶回饋分析、售後服務和對弱勢使用者的保護措施。"
-        
-        if industry:
-            prompt += f"\n\n必須針對{industry}產業可能造成的環境影響與產品責任。"
-            prompt += f"描述產品責任計畫，以應對{industry}產業特定的環境影響、產品生命週期考量和適用於{industry}產業的產品安全要求。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、相關法律合規、市場衝擊，並描述產品責任計畫如何應對產業特定的環境影響、產品生命週期考量和適用於產業的產品安全要求。"
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
@@ -331,10 +314,7 @@ class PPTContentEngine:
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請說明如何透過透明度、負責任的行銷、資料隱私、投訴解決和生命週期管理來保護客戶福祉。"
         prompt += "包括與消費者保護機構的合作夥伴關係和用於監控信任的指標。"
-        
-        if industry:
-            prompt += f"\n\n必須針對{industry}產業可能造成的環境影響與產品責任。"
-            prompt += f"說明客戶福祉保護措施，以應對{industry}產業產品/服務的環境影響、產品責任考量和適用於{industry}產業的客戶安全要求。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、市場衝擊，並說明客戶福祉保護措施如何應對產業產品/服務的環境影響、產品責任考量和適用於產業的客戶安全要求。"
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
@@ -380,8 +360,7 @@ class PPTContentEngine:
         prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
         prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
         prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
-        prompt += f"\n\n必須依據{industry}產業的特性，提出相對的環境與社會責任規劃。"
-        prompt += f"說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
         prompt += "總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
@@ -416,7 +395,7 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）的利害關係人識別章節，用於 ESG 報告。"
-        prompt += f"\n\n必須緊扣{industry}產業的特性，識別關鍵利害關係人群體，如投資人、客戶、員工、監管機構、供應商和社區，說明每個群體的重要性。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人，識別關鍵利害關係人群體，如投資人、客戶、員工、監管機構、供應商和社區，說明每個群體的重要性。"
         prompt += "討論他們的期望、若被忽視的潛在風險，以及如何設定優先順序。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的高階主管語調，不使用項目符號或標題。"
@@ -438,11 +417,7 @@ class PPTContentEngine:
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）分析利害關係人的需求和影響力。"
         prompt += "涵蓋顯著性（權力、合法性、緊迫性）、重大議題、溝通節奏，以及監控參與成效的關鍵績效指標。"
         prompt += "保持高階主管語調，使用簡潔的中文，避免項目符號。"
-        
-        if industry:
-            prompt += f"\n\n必須針對{industry}產業分析關係人屬性與關心的議題。"
-            prompt += f"分析{industry}產業中哪些利害關係人群體最具影響力，以及他們優先關注的議題。"
-            prompt += f"討論{industry}產業特定的重大議題、溝通方式和參與指標。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人，說明產業中哪些利害關係人群體最具影響力，以及他們優先關注的議題，並討論產業特定的重大議題、溝通方式和參與指標。"
         
         if tcfd_market and len(tcfd_market) < 500:
             prompt += f"\n\n市場趨勢背景：{tcfd_market[:300]}"
@@ -499,7 +474,7 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）說明公司的 ESG 核心支柱，涵蓋地球（Planet）、產品（Products）和人員（People），用於 ESG 報告。"
-        prompt += f"\n\n必須緊扣{industry}產業的特性，討論重點領域、跨價值鏈的整合、衡量實務和問責機制。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人、相關法律合規、市場衝擊，討論重點領域、跨價值鏈的整合、衡量實務和問責機制。"
         prompt += "提及表格顯示每個支柱的摘要和倡議。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，避免項目符號。"
@@ -551,8 +526,8 @@ class PPTContentEngine:
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 375 字（對應 250 英文單字）說明公司如何將永續目標與標示的 SDG 圖示對齊，用於 ESG 報告。"
-        prompt += f"\n\n必須針對{industry}產業分析關係人屬性與關心的議題，說明哪些 SDG 與{industry}產業最相關，以及{industry}產業中利害關係人的關注如何與特定 SDG 目標對齊。"
-        prompt += f"詳細說明{industry}產業特定的計畫、夥伴關係和指標，這些計畫、夥伴關係和指標解決{industry}產業背景下的利害關係人優先事項。"
+        prompt += f"\n\n【重要】請根據本公司產業，分析關係人，說明哪些 SDG 與產業最相關，以及產業中利害關係人的關注如何與特定 SDG 目標對齊。"
+        prompt += f"詳細說明產業特定的計畫、夥伴關係和指標，這些計畫、夥伴關係和指標解決產業背景下的利害關係人優先事項。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，保持專業且易於理解的語調。"
         
