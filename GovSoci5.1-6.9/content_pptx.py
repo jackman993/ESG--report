@@ -126,8 +126,10 @@ class PPTContentEngine:
 
     # Slide-specific generators (中文版)
     def generate_governance_overview(self) -> str:
-        # 整合環境段 log 資料（產業別、公司背景）
+        # 整合環境段 log 資料（公司名稱、產業、市場、公司背景）
+        company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "該產業")
+        tcfd_market = self.env_context.get("tcfd_market_context", "")
         company_context = self.env_context.get("company_context", "")
         
         prompt = f"你是一位資深的 ESG 顧問和{industry}產業分析專家。"
@@ -135,6 +137,12 @@ class PPTContentEngine:
         prompt += f"必須緊扣{industry}產業的治理特色，描述治理架構、董事會組成、監督節奏和利害關係人溝通。"
         prompt += "使用高階主管語調，保持專業且易於理解。"
         
+        if company_name:
+            prompt += f"\n\n公司名稱：{company_name}"
+        if industry:
+            prompt += f"\n\n產業別：{industry}"
+        if tcfd_market and len(tcfd_market) < 500:
+            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         if company_context:
             prompt += f"\n\n公司背景：{company_context}"
         
@@ -157,8 +165,10 @@ class PPTContentEngine:
         return self._call(prompt, word_count=280, is_chinese=True)
 
     def generate_legal_alignment_overview(self) -> str:
-        # 整合環境段 log 資料（產業別、TCFD 政策）
+        # 整合環境段 log 資料（公司名稱、產業、市場、TCFD 政策）
+        company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "該產業")
+        tcfd_market = self.env_context.get("tcfd_market_context", "")
         tcfd_policy = self.env_context.get("tcfd_policy_context", "")
         
         prompt = f"你是一位{industry}產業法規遵循專家和 ESG 顧問。"
@@ -166,14 +176,22 @@ class PPTContentEngine:
         prompt += f"必須說明{industry}產業如何維持法規對齊、協調合規利害關係人，以及升級法律風險。"
         prompt += "使用專業且清晰的語調。"
         
+        if company_name:
+            prompt += f"\n\n公司名稱：{company_name}"
+        if industry:
+            prompt += f"\n\n產業別：{industry}"
+        if tcfd_market and len(tcfd_market) < 500:
+            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         if tcfd_policy and len(tcfd_policy) < 500:
             prompt += f"\n\n關鍵法規挑戰：{tcfd_policy[:300]}"
         
         return self._call(prompt, word_count=280, is_chinese=True)
 
     def generate_legal_appliance_overview(self) -> str:
-        # 整合環境段 log 資料（產業別、TCFD 政策）
+        # 整合環境段 log 資料（公司名稱、產業、市場、TCFD 政策）
+        company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "該產業")
+        tcfd_market = self.env_context.get("tcfd_market_context", "")
         tcfd_policy = self.env_context.get("tcfd_policy_context", "")
         
         prompt = f"你是一位{industry}產業法規遵循專家和 ESG 顧問。"
@@ -181,6 +199,12 @@ class PPTContentEngine:
         prompt += f"必須說明{industry}產業的法律遵循計畫，強調架構、稽核軌跡、內部控制和對治理的益處。"
         prompt += "使用專業且具說服力的語調。"
         
+        if company_name:
+            prompt += f"\n\n公司名稱：{company_name}"
+        if industry:
+            prompt += f"\n\n產業別：{industry}"
+        if tcfd_market and len(tcfd_market) < 500:
+            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         if tcfd_policy and len(tcfd_policy) < 500:
             prompt += f"\n\n法規遵循背景：{tcfd_policy[:300]}"
         
@@ -225,8 +249,10 @@ class PPTContentEngine:
         return self._call(prompt, word_count=240, is_chinese=True)
 
     def generate_social_health_safety(self) -> str:
-        # 整合環境段 log 資料（產業別、TCFD 政策）
+        # 整合環境段 log 資料（公司名稱、產業、市場、TCFD 政策）
+        company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "該產業")
+        tcfd_market = self.env_context.get("tcfd_market_context", "")
         tcfd_policy = self.env_context.get("tcfd_policy_context", "")
         
         prompt = f"你是一位{industry}產業職業安全衛生專家和 ESG 顧問。"
@@ -235,6 +261,12 @@ class PPTContentEngine:
         prompt += "說明氣候相關法規可能如何影響工作環境和職業安全規劃。"
         prompt += "使用專業且清晰的語調。"
         
+        if company_name:
+            prompt += f"\n\n公司名稱：{company_name}"
+        if industry:
+            prompt += f"\n\n產業別：{industry}"
+        if tcfd_market and len(tcfd_market) < 500:
+            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         if tcfd_policy and len(tcfd_policy) < 500:
             prompt += f"\n\n法規變化背景：{tcfd_policy[:300]}"
         
@@ -304,7 +336,8 @@ class PPTContentEngine:
         return self._call(prompt, word_count=230, is_chinese=True)
 
     def generate_social_action_plan_overview(self) -> str:
-        # 整合環境段 log 資料（產業別、TCFD 市場、碳排放）
+        # 整合環境段 log 資料（公司名稱、產業、市場、碳排放）
+        company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "該產業")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         emission_context = self.env_context.get("emission_context", "")
@@ -315,8 +348,12 @@ class PPTContentEngine:
         prompt += "說明市場期望和環境績效如何影響社會投資優先順序。"
         prompt += "使用專業且清晰的語調。"
         
+        if company_name:
+            prompt += f"\n\n公司名稱：{company_name}"
+        if industry:
+            prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
-            prompt += f"\n\n市場趨勢背景：{tcfd_market[:300]}"
+            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         if emission_context:
             prompt += f"\n\n環境績效背景：{emission_context}"
         
@@ -355,7 +392,8 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_social_product_responsibility(self) -> str:
-        # 整合環境段 log 資料（產業別、TCFD 市場）
+        # 整合環境段 log 資料（公司名稱、產業、市場）
+        company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "該產業")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
@@ -366,13 +404,18 @@ class PPTContentEngine:
         prompt += "說明市場對永續產品的期望如何影響產品責任策略。"
         prompt += "使用專業且具說服力的語調。"
         
+        if company_name:
+            prompt += f"\n\n公司名稱：{company_name}"
+        if industry:
+            prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
-            prompt += f"\n\n市場趨勢背景：{tcfd_market[:300]}"
+            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
     def generate_social_customer_welfare(self) -> str:
-        # 整合環境段 log 資料（產業別、TCFD 市場）
+        # 整合環境段 log 資料（公司名稱、產業、市場）
+        company_name = self.env_context.get("company_name", "本公司")
         industry = self.env_context.get("industry", "該產業")
         tcfd_market = self.env_context.get("tcfd_market_context", "")
         
@@ -383,8 +426,12 @@ class PPTContentEngine:
         prompt += "說明市場對永續產品的期望如何影響客戶保護策略。"
         prompt += "使用專業且清晰的語調。"
         
+        if company_name:
+            prompt += f"\n\n公司名稱：{company_name}"
+        if industry:
+            prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:
-            prompt += f"\n\n市場趨勢背景：{tcfd_market[:300]}"
+            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         
         return self._call(prompt, word_count=230, is_chinese=True)
 

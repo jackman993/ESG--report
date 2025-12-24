@@ -140,6 +140,9 @@ def _standardize_log_data(raw_data: Dict[str, Any]) -> Dict[str, Any]:
     emission_result = raw_data.get("emission_result", {})
     standardized["emission_total_tco2e"] = emission_result.get("total", 0.0)
     
+    # 公司名稱
+    standardized["company_name"] = raw_data.get("company_name", "").strip()
+    
     # Session ID 和時間戳
     standardized["session_id"] = raw_data.get("session_id", "")
     standardized["timestamp"] = raw_data.get("timestamp", "")
@@ -163,6 +166,7 @@ def get_prompt_context(log_data: Optional[Dict[str, Any]] = None) -> Dict[str, s
     if log_data is None:
         return {
             "industry": "",
+            "company_name": "",
             "company_context": "",
             "tcfd_policy_context": "",
             "tcfd_market_context": "",
@@ -171,6 +175,7 @@ def get_prompt_context(log_data: Optional[Dict[str, Any]] = None) -> Dict[str, s
     
     # 建立公司背景上下文
     industry = log_data.get("industry", "")
+    company_name = log_data.get("company_name", "").strip()
     revenue_display = log_data.get("estimated_revenue_display", "")
     company_size = log_data.get("company_size", "")
     
@@ -182,6 +187,7 @@ def get_prompt_context(log_data: Optional[Dict[str, Any]] = None) -> Dict[str, s
     
     return {
         "industry": industry,
+        "company_name": company_name if company_name else "本公司",
         "company_context": company_context.strip(),
         "tcfd_policy_context": log_data.get("tcfd_policy_regulation", ""),
         "tcfd_market_context": log_data.get("tcfd_market_trends", ""),
