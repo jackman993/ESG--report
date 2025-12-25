@@ -509,26 +509,16 @@ class PPTContentEngine:
         else:
             print(f"[generate_cooperation_info] 成功讀取 150 字分析（長度: {len(industry_analysis)}字）")
         
-        # 修改舊 prompt：硬插入 150 字分析
-        prompt = f"""【⚠️ 最高優先級 - 產業別分析（必須嚴格遵守，不可違反）】
-以下產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離：
+        # 測試用：極簡 prompt，只保留公司名稱和 150 字分析，讓 LLM 自由發揮
+        prompt = f"""以下產業別分析：
 
 {industry_analysis}
 
-【任務】
-請根據上述產業別分析，撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。
-
-【⚠️ 強制要求（必須遵守）】
-1. 第一句使用公司名稱：{company_name}
-2. 【必須】引用上述產業別分析中的具體數據（如年營收、碳排數據、耗能等級等），不得忽略或抽象化
-3. 【必須】內容與上述產業別分析完全一致，不得產生矛盾
-4. 使用「我們」和「本公司」，保持第一人稱視角
-5. 使用簡潔的中文，不使用項目符號，保持高階主管語調
-
-【⚠️ 再次提醒】
-上述產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離。"""
+請根據上述產業別分析，撰寫描述 {company_name} 的合作概況。"""
         
-        print(f"[generate_cooperation_info] 150字硬寫入 prompt（{len(industry_analysis)}字）")
+        print(f"[generate_cooperation_info] 測試模式：極簡 prompt，150字分析長度={len(industry_analysis)}字")
+        print(f"[generate_cooperation_info] prompt 內容:")
+        print(prompt)
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
