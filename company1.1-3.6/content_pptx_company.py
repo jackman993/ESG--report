@@ -33,34 +33,38 @@ class PPTContentEngine:
             raise RuntimeError("ANTHROPIC_API_KEY is not configured.")
         self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         self.model = self._resolve_model()
-        # 載入環境段 log 資料
+        
+        # 產業別：獨立管線，直接讀取，最優先處理
+        self.industry = self._load_industry_directly()
+        print(f"[產業別管線] 讀取結果: {repr(self.industry)}")
+        
+        # 載入環境段 log 資料（其他資料）
         self.env_log_data = self._load_environment_log()
-        
-        # 調試：檢查 env_log_data 中的產業別
-        print(f"[DEBUG] PPTContentEngine.__init__: 載入 env_log_data")
-        if self.env_log_data:
-            print(f"[DEBUG] env_log_data keys: {list(self.env_log_data.keys())}")
-            print(f"[DEBUG] env_log_data['industry']: {repr(self.env_log_data.get('industry', 'KEY NOT FOUND'))}")
-            print(f"[DEBUG] env_log_data['industry'] 類型: {type(self.env_log_data.get('industry'))}")
-            print(f"[DEBUG] env_log_data['industry'] 是否為空字串: {self.env_log_data.get('industry', '') == ''}")
-        else:
-            print(f"[ERROR] env_log_data 為 None！")
-        
         self.env_context = get_prompt_context(self.env_log_data)
+    
+    def _load_industry_directly(self) -> str:
+        """
+        獨立管線：直接讀取最新的 Step 1 文件中的產業別
+        不經過任何複雜流程，就這一個目的
+        """
+        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+        if not log_dir.exists():
+            return ""
         
-        # 調試信息：確認產業別是否成功載入
-        print(f"[DEBUG] PPTContentEngine.__init__: 建立 env_context")
-        print(f"[DEBUG] env_context keys: {list(self.env_context.keys())}")
-        industry = self.env_context.get("industry", "")
-        print(f"[DEBUG] env_context['industry']: {repr(industry)}")
-        print(f"[DEBUG] env_context['industry'] 類型: {type(industry)}")
-        print(f"[DEBUG] env_context['industry'] 是否為空字串: {industry == ''}")
-        if industry:
-            print(f"[OK] PPTContentEngine: 成功載入產業別: {industry}")
-        else:
-            print(f"[ERROR] PPTContentEngine: 未能從 log 載入產業別！")
-            if self.env_log_data:
-                print(f"[DEBUG] env_log_data 中的 industry: {repr(self.env_log_data.get('industry', 'NOT FOUND'))}")
+        # 找最新的 Step 1 文件
+        for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
+            try:
+                with open(log_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                step = str(data.get("step", "")).lower()
+                if "step 1" in step:
+                    ind = data.get("industry", "")
+                    if ind and str(ind).strip():
+                        print(f"[產業別管線] 從 {log_file.name} 讀取: {ind}")
+                        return str(ind).strip()
+            except:
+                continue
+        return ""
 
     def _resolve_model(self) -> str:
         candidates = []
@@ -378,28 +382,11 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_cooperation_info(self) -> str:
-        # 最簡單直接：直接讀取 log 文件，不經過任何抽象層
-        industry = ""
-        company_name = "本公司"
-        
-        # 直接讀取 log 目錄，找最新的 Step 1 文件
-        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
-        if log_dir.exists():
-            for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
-                try:
-                    with open(log_file, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                    # 檢查是否是 Step 1 且有 industry
-                    step = str(data.get("step", "")).lower()
-                    if "step 1" in step:
-                        ind = data.get("industry", "")
-                        if ind and str(ind).strip():
-                            industry = str(ind).strip()
-                            company_name = str(data.get("company_name", "本公司")).strip() or "本公司"
-                            print(f"[OK] 讀取產業別: {industry}")
-                            break
-                except:
-                    continue
+        # 直接使用獨立管線讀取的產業別
+        industry = self.industry
+        company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
+        company_context = self.env_context.get("company_context", "") if self.env_context else ""
+        tcfd_market = self.env_context.get("tcfd_market_context", "") if self.env_context else ""
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
@@ -426,12 +413,16 @@ class PPTContentEngine:
             prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         
         # 最後檢查 prompt 是否包含產業別
+        print(f"\n{'='*60}")
+        print(f"[檢查] industry 變數值: {repr(industry)}")
+        print(f"[檢查] industry 是否為空: {not industry}")
+        print(f"[檢查] prompt 長度: {len(prompt)}")
+        print(f"[檢查] prompt 是否包含產業別 '{industry}': {industry in prompt if industry else 'N/A'}")
         if industry:
-            if industry in prompt:
-                print(f"[OK] 最終檢查: prompt 包含產業別 '{industry}'")
-            else:
-                print(f"[ERROR] 最終檢查: prompt 不包含產業別 '{industry}'！")
-                print(f"[ERROR] prompt 前500字: {prompt[:500]}")
+            print(f"[檢查] prompt 中包含 '{industry}' 的次數: {prompt.count(industry)}")
+        print(f"[檢查] prompt 完整內容:")
+        print(prompt)
+        print(f"{'='*60}\n")
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
