@@ -534,11 +534,7 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         
         # 最簡單的導入方式
         sys.path.insert(0, str(company_path))
-        from industry_analysis import generate_industry_analysis
-        
-        # 調試：打印 session_id 和路徑
-        st.write(f"[DEBUG] session_id: {session_id}")
-        st.write(f"[DEBUG] company_path: {company_path}")
+        from industry_analysis import generate_industry_analysis, LOG_FILE_BASE
         
         # 調用函數（傳入 session_id、API_KEY 和 model）- 只寫入 log，不生成 pptx
         # 使用 Streamlit UI 輸入的 API_KEY 和與 TCFD 表格相同的模型
@@ -551,12 +547,8 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         analysis_text = industry_analysis_data.get("industry_analysis", "")
         analysis_length = len(analysis_text) if analysis_text else 0
         
-        # 檢查 log 文件是否存在（統一使用 TCFD generator/logs）
-        # industry_analysis.py 中 LOG_FILE_BASE = ESG--report/TCFD generator/logs
-        # 這裡從 base_dir (TCFD generator) 的 parent (ESG--report) 開始計算
-        esg_report_dir = base_dir.parent  # TCFD generator -> ESG--report
-        log_dir = esg_report_dir / "TCFD generator" / "logs"
-        log_file = log_dir / f"session_{session_id}_industry_analysis.json"
+        # 檢查 log 文件是否存在（直接使用 industry_analysis.py 中的 LOG_FILE_BASE，不重新計算）
+        log_file = LOG_FILE_BASE / f"session_{session_id}_industry_analysis.json"
         
         if log_file.exists():
             st.success(f"✅ 【王子路徑】產業別分析已生成並寫入 log（{analysis_length}字）- 這是第 6 個步驟（只 log，不輸出 pptx）")
