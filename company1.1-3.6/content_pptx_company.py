@@ -378,39 +378,28 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_cooperation_info(self) -> str:
-        # 直接從 env_log_data 獲取產業別（簡化，不經過 env_context）
+        # 最簡單直接：直接讀取 log 文件，不經過任何抽象層
         industry = ""
         company_name = "本公司"
-        tcfd_market = ""
         
-        if self.env_log_data:
-            industry = self.env_log_data.get("industry", "").strip() if self.env_log_data.get("industry") else ""
-            company_name = self.env_log_data.get("company_name", "本公司").strip() or "本公司"
-            tcfd_market = self.env_log_data.get("tcfd_market_trends", "")
-            print(f"[DEBUG] 從 env_log_data 讀取: industry={repr(industry)}")
-        
-        # 如果還是沒有產業別，直接讀取最新的 Step 1 文件
-        if not industry:
-            from env_log_reader import DEFAULT_LOG_DIR
-            import json
-            log_dir = Path(DEFAULT_LOG_DIR)
-            if log_dir.exists():
-                json_files = list(log_dir.glob("*.json"))
-                # 優先找 Step 1 文件
-                for log_file in sorted(json_files, key=lambda f: f.stat().st_mtime, reverse=True):
-                    try:
-                        with open(log_file, "r", encoding="utf-8") as f:
-                            data = json.load(f)
-                        step = str(data.get("step", "")).lower()
-                        if "step 1" in step and data.get("industry"):
-                            industry = str(data.get("industry")).strip()
-                            if industry:
-                                print(f"[INFO] 直接從 Step 1 文件讀取產業別: {industry} (來源: {log_file.name})")
-                                break
-                    except:
-                        continue
-        
-        company_context = self.env_context.get("company_context", "") if self.env_context else ""
+        # 直接讀取 log 目錄，找最新的 Step 1 文件
+        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+        if log_dir.exists():
+            for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    # 檢查是否是 Step 1 且有 industry
+                    step = str(data.get("step", "")).lower()
+                    if "step 1" in step:
+                        ind = data.get("industry", "")
+                        if ind and str(ind).strip():
+                            industry = str(ind).strip()
+                            company_name = str(data.get("company_name", "本公司")).strip() or "本公司"
+                            print(f"[OK] 讀取產業別: {industry}")
+                            break
+                except:
+                    continue
         
         prompt = self._format_expert_intro(company_name, industry)
         prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
