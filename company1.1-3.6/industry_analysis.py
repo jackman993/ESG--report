@@ -123,8 +123,20 @@ def save_industry_analysis_to_log(data: Dict[str, Any]) -> None:
     session_id = data["session_id"]
     log_file = LOG_FILE_BASE / f"session_{session_id}_industry_analysis.json"
     
-    with open(log_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-        f.flush()
-        os.fsync(f.fileno())
+    # 調試：打印路徑信息
+    print(f"[save_industry_analysis_to_log] LOG_FILE_BASE: {LOG_FILE_BASE}")
+    print(f"[save_industry_analysis_to_log] log_file: {log_file}")
+    print(f"[save_industry_analysis_to_log] log_file.exists(): {log_file.exists()}")
+    print(f"[save_industry_analysis_to_log] 準備寫入 {len(data.get('industry_analysis', ''))} 字")
+    
+    try:
+        with open(log_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        print(f"[save_industry_analysis_to_log] ✅ 成功寫入: {log_file}")
+        print(f"[save_industry_analysis_to_log] 文件大小: {log_file.stat().st_size} bytes")
+    except Exception as e:
+        print(f"[save_industry_analysis_to_log] ❌ 寫入失敗: {e}")
+        raise
 
