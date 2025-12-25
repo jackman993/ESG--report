@@ -341,6 +341,81 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     if industry:
         st.session_state.industry_selected = industry
     
+    # ========== 【+1 步驟 - 皇帝路徑：第一個 LLM 調用，最優先執行】==========
+    st.info("👑 【皇帝路徑】正在生成產業別分析（150字）- 第一個 LLM 調用...")
+    
+    # 導入追蹤器
+    tracker_path = Path(__file__).parent.parent / "logs" / "step1_plus1_tracker.py"
+    if tracker_path.exists():
+        sys.path.insert(0, str(tracker_path.parent))
+        from step1_plus1_tracker import log_plus1_step
+    else:
+        log_plus1_step = None
+    
+    # 取得 session_id（從已保存的 log 或生成新的）
+    session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+    st.session_state.session_id = session_id
+    
+    # 記錄 +1 步驟開始
+    if log_plus1_step:
+        try:
+            log_plus1_step(session_id, "started", {
+                "industry": industry,
+                "step": "Step 1 - 皇帝路徑（第一個 LLM 調用，在 TCFD 表格生成之前）"
+            })
+        except:
+            pass
+    
+    try:
+        # 導入 industry_analysis 模組（+1 步驟：第一個 LLM 調用，皇帝路徑）
+        BASE_DIR = Path(__file__).parent.parent  # TCFD generator -> ESG--report
+        company_path = BASE_DIR / "company1.1-3.6"
+        sys.path.insert(0, str(company_path))
+        from industry_analysis import generate_industry_analysis
+        
+        # 取得月電費
+        monthly_bill_value = company_profile.get("monthly_bill_ntd", monthly_bill)
+        if not monthly_bill_value:
+            monthly_bill_value = company_profile.get("monthly_electricity_bill_ntd", monthly_bill)
+        
+        # 調用 generate_industry_analysis() 生成 150 字分析（皇帝路徑）
+        industry_analysis_data = generate_industry_analysis(
+            industry=industry,
+            monthly_electricity_bill_ntd=monthly_bill_value,
+            session_id=session_id
+        )
+        
+        analysis_text = industry_analysis_data.get("industry_analysis", "")
+        analysis_length = len(analysis_text) if analysis_text else 0
+        
+        # 記錄 +1 步驟成功
+        if log_plus1_step:
+            try:
+                log_plus1_step(session_id, "success", {
+                    "analysis_length": analysis_length,
+                    "file_path": f"session_{session_id}_industry_analysis.json"
+                })
+            except:
+                pass
+        
+        st.success(f"✅ 【皇帝路徑】產業別分析已生成並寫入 log（{analysis_length}字）- 這是第一個 LLM 調用")
+    except Exception as e:
+        # 記錄 +1 步驟失敗
+        if log_plus1_step:
+            try:
+                log_plus1_step(session_id, "failed", {
+                    "error": str(e),
+                    "error_type": type(e).__name__
+                })
+            except:
+                pass
+        
+        st.error(f"❌ 【皇帝路徑】產業別分析生成失敗: {e}")
+        st.exception(e)  # 顯示完整錯誤信息
+        st.stop()  # 皇帝路徑失敗，停止後續流程
+    
+    # ========== 皇帝路徑完成，開始生成 TCFD 表格 ==========
+    
     # 初始化 Anthropic client（加入錯誤處理）
     try:
         client = anthropic.Anthropic(api_key=API_KEY.strip())
@@ -456,73 +531,6 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         tcfd_output_folder = str(results[0]["path"].parent)
         st.session_state.tcfd_output_folder = tcfd_output_folder
         st.info(f"📁 TCFD 輸出資料夾：{tcfd_output_folder}")
-    
-    # +1 步驟：TCFD 五個表格完成後，立即生成產業別分析（150字），硬寫入 log
-    st.info("📊 正在生成產業別分析（150字）...")
-    
-    # 導入追蹤器
-    tracker_path = Path(__file__).parent.parent / "logs" / "step1_plus1_tracker.py"
-    if tracker_path.exists():
-        sys.path.insert(0, str(tracker_path.parent))
-        from step1_plus1_tracker import log_plus1_step
-    
-    # 取得 session_id（從已保存的 log 或生成新的）
-    session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
-    st.session_state.session_id = session_id
-    
-    # 記錄 +1 步驟開始
-    try:
-        log_plus1_step(session_id, "started", {
-            "industry": industry,
-            "step": "Step 1 - 子步驟2 (TCFD表格完成後)"
-        })
-    except:
-        pass
-    
-    try:
-        # 導入 industry_analysis 模組
-        BASE_DIR = Path(__file__).parent.parent.parent  # ESG go/
-        company_path = BASE_DIR / "company1.1-3.6"
-        sys.path.insert(0, str(company_path))
-        from industry_analysis import generate_industry_analysis
-        
-        # 取得月電費
-        monthly_bill = company_profile.get("monthly_bill_ntd", 0.0)
-        if not monthly_bill:
-            monthly_bill = company_profile.get("monthly_electricity_bill_ntd", 0.0)
-        
-        # 調用 generate_industry_analysis() 生成 150 字分析
-        industry_analysis_data = generate_industry_analysis(
-            industry=industry,
-            monthly_electricity_bill_ntd=monthly_bill,
-            session_id=session_id
-        )
-        
-        analysis_text = industry_analysis_data.get("industry_analysis", "")
-        analysis_length = len(analysis_text) if analysis_text else 0
-        
-        # 記錄 +1 步驟成功
-        try:
-            log_plus1_step(session_id, "success", {
-                "analysis_length": analysis_length,
-                "file_path": f"session_{session_id}_industry_analysis.json"
-            })
-        except:
-            pass
-        
-        st.success(f"✅ 產業別分析已生成並寫入 log（{analysis_length}字）")
-    except Exception as e:
-        # 記錄 +1 步驟失敗
-        try:
-            log_plus1_step(session_id, "failed", {
-                "error": str(e),
-                "error_type": type(e).__name__
-            })
-        except:
-            pass
-        
-        st.warning(f"⚠️ 產業別分析生成失敗: {e}，將繼續流程")
-        st.exception(e)  # 顯示完整錯誤信息
     
     st.balloons()
     st.session_state.step1_done = True
