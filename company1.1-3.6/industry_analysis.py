@@ -160,10 +160,12 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
         prompt += f"""
 - 年碳排放總額：{emission_total_tco2e:.2f} tCO₂e（必須明確標示）"""
     
+    # 格式範例（處理 emission_total_tco2e 可能為 None 的情況）
+    emission_example = f"{emission_total_tco2e:.2f} tCO₂e" if emission_total_tco2e and emission_total_tco2e > 0 else "XX.XX tCO₂e"
     prompt += f"""
 
 格式範例：
-「{industry}產業面臨...規範要求...市場趨勢...風險分析...年碳排放總額 {emission_total_tco2e:.2f} tCO₂e...耗能等級：中耗能。計算年營收：54,000,000 NTD。」"""
+「{industry}產業面臨...規範要求...市場趨勢...風險分析...年碳排放總額 {emission_example}...耗能等級：中耗能。計算年營收：54,000,000 NTD。」"""
 
     # 調用 LLM
     response = client.messages.create(
