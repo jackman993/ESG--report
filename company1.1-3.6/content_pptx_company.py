@@ -487,6 +487,12 @@ class PPTContentEngine:
         print(f"[Express generate_cooperation_info] 150字分析長度={len(industry_analysis) if industry_analysis else 0}")
         print(f"[Express generate_cooperation_info] 150字分析前100字={industry_analysis[:100] if industry_analysis else 'None'}")
         
+        # 檢查 150 字分析是否成功讀取
+        if not industry_analysis or len(industry_analysis) < 50:
+            print(f"[Express generate_cooperation_info] ❌ 150字分析讀取失敗或為空，長度: {len(industry_analysis) if industry_analysis else 0}")
+            print(f"[Express generate_cooperation_info] ❌ 無法繼續，必須有 150 字分析才能生成內容")
+            raise ValueError(f"150字產業別分析讀取失敗，無法生成公司合作概況。請確認 log 文件存在且包含 industry_analysis 字段。")
+        
         # 只有一個 prompt，直接硬寫入 150 字分析（無 if/else，無選擇，不抽取產業別）
         prompt = f"""【⚠️ 最高優先級 - 產業別分析（必須嚴格遵守，不可違反）】
 以下產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離：
@@ -509,13 +515,14 @@ class PPTContentEngine:
 【⚠️ 再次提醒】
 上述產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離。"""
         
-        print(f"[Express OK] 150字硬寫入 prompt（{len(industry_analysis) if industry_analysis else 0}字），無條件判斷，只有一個 prompt，不抽取產業別")
+        print(f"[Express OK] 150字硬寫入 prompt（{len(industry_analysis)}字），無條件判斷，只有一個 prompt，不抽取產業別")
         
-        # 最後檢查 prompt 是否包含產業別
+        # 最後檢查 prompt 是否包含 150 字分析
         print(f"\n{'='*60}")
         print(f"[檢查] prompt 長度: {len(prompt)}")
-        print(f"[檢查] prompt 完整內容:")
-        print(prompt)
+        print(f"[檢查] prompt 是否包含 150 字分析: {'是' if industry_analysis in prompt else '否'}")
+        print(f"[檢查] prompt 前 500 字:")
+        print(prompt[:500])
         print(f"{'='*60}\n")
         
         return self._call(prompt, word_count=230, is_chinese=True)
