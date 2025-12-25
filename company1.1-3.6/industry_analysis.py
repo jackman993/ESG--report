@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from config_pptx_company import ANTHROPIC_API_KEY, CLAUDE_MODEL, CLAUDE_MODEL_FALLBACKS
+from config_pptx_company import CLAUDE_MODEL, CLAUDE_MODEL_FALLBACKS
 
 # 使用相對路徑（兼容本地和容器環境）
 # 從當前文件位置計算：company1.1-3.6/industry_analysis.py -> TCFD generator/logs
@@ -17,14 +17,22 @@ _base_dir = _current_file.parent.parent  # ESG--report/
 LOG_FILE_BASE = _base_dir / "TCFD generator" / "logs"
 
 
-def generate_industry_analysis(session_id: str) -> Dict[str, Any]:
+def generate_industry_analysis(session_id: str, api_key: str = None) -> Dict[str, Any]:
     """
     生成產業別分析（150字）- 寫死絕對路徑，不抽象
+    api_key: 從 Streamlit UI 輸入的 API key（優先使用），如果為 None 則從 config 讀取
     """
-    if not ANTHROPIC_API_KEY:
-        raise RuntimeError("ANTHROPIC_API_KEY is not configured.")
+    # 優先使用傳入的 api_key，否則從 config 讀取（向後兼容）
+    if api_key:
+        final_api_key = api_key
+    else:
+        from config_pptx_company import ANTHROPIC_API_KEY
+        final_api_key = ANTHROPIC_API_KEY
     
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+    if not final_api_key:
+        raise RuntimeError("API key is not configured.")
+    
+    client = anthropic.Anthropic(api_key=final_api_key)
     model = CLAUDE_MODEL if CLAUDE_MODEL else "claude-3-haiku-20240307"
     
     # 相對路徑讀取 log（兼容所有環境）
