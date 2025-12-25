@@ -421,28 +421,41 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     
     try:
         # 導入 industry_analysis 模組（+1 步驟：第一個 LLM 調用，皇帝路徑）
-        # 使用絕對路徑，不依賴 sys.path
+        # 完全重寫：使用絕對路徑，強制清除所有緩存
         import importlib.util
+        import importlib
+        
+        # 絕對路徑
         industry_analysis_path = r"C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\industry_analysis.py"
         
-        # 強制清除緩存
-        module_name = 'industry_analysis'
-        if module_name in sys.modules:
-            del sys.modules[module_name]
+        # 清除所有可能的緩存
+        modules_to_remove = [k for k in sys.modules.keys() if 'industry_analysis' in k]
+        for mod in modules_to_remove:
+            del sys.modules[mod]
         
-        # 使用絕對路徑導入
-        spec = importlib.util.spec_from_file_location(module_name, industry_analysis_path)
+        # 使用絕對路徑直接載入
+        spec = importlib.util.spec_from_file_location("industry_analysis_fresh", industry_analysis_path)
+        if spec is None or spec.loader is None:
+            raise ImportError(f"無法載入模組: {industry_analysis_path}")
+        
         industry_analysis_module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(industry_analysis_module)
+        
+        # 直接取得函數
         generate_industry_analysis = industry_analysis_module.generate_industry_analysis
         
-        # 驗證函數簽名
+        # 強制驗證：檢查函數簽名
         import inspect
         sig = inspect.signature(generate_industry_analysis)
-        st.write(f"[DEBUG] generate_industry_analysis 簽名: {sig}")
+        params = list(sig.parameters.keys())
         
-        # 調用 generate_industry_analysis() 生成 150 字分析（皇帝路徑 - 簡化引擎）
-        # 只傳 session_id，所有數據從 log 讀取
+        # 如果參數不對，直接報錯
+        if len(params) != 1 or params[0] != 'session_id':
+            raise ValueError(f"函數簽名錯誤！期望: (session_id), 實際: {sig}")
+        
+        st.write(f"✅ [DEBUG] 函數已正確載入，簽名: {sig}, 參數: {params}")
+        
+        # 調用函數（只傳 session_id）
         industry_analysis_data = generate_industry_analysis(session_id=session_id)
         
         analysis_text = industry_analysis_data.get("industry_analysis", "")
