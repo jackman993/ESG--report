@@ -394,79 +394,7 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     }
     save_session_log(session_log_update)
     
-    # ========== 【+1 步驟 - 皇帝路徑：第一個 LLM 調用，最優先執行】==========
-    st.info("👑 【皇帝路徑】正在生成產業別分析（150字）- 第一個 LLM 調用...")
-    
-    # 導入追蹤器
-    tracker_path = Path(__file__).parent.parent / "logs" / "step1_plus1_tracker.py"
-    if tracker_path.exists():
-        sys.path.insert(0, str(tracker_path.parent))
-        from step1_plus1_tracker import log_plus1_step
-    else:
-        log_plus1_step = None
-    
-    # 取得 session_id（從已保存的 log 或生成新的）
-    session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
-    st.session_state.session_id = session_id
-    
-    # 記錄 +1 步驟開始
-    if log_plus1_step:
-        try:
-            log_plus1_step(session_id, "started", {
-                "industry": industry,
-                "step": "Step 1 - 皇帝路徑（第一個 LLM 調用，在 TCFD 表格生成之前）"
-            })
-        except:
-            pass
-    
-    try:
-        # 導入 industry_analysis 模組（+1 步驟：第一個 LLM 調用，皇帝路徑）
-        # 方案：使用最簡單的 sys.path.insert + from import（避免複雜的 importlib）
-        current_file = Path(__file__)  # TCFD generator/pages/1_🌍_碳排與TCFD氣候治理.py
-        base_dir = current_file.parent.parent  # TCFD generator -> ESG--report
-        company_path = base_dir / "company1.1-3.6"
-        
-        # 清除緩存
-        if 'industry_analysis' in sys.modules:
-            del sys.modules['industry_analysis']
-        
-        # 最簡單的導入方式
-        sys.path.insert(0, str(company_path))
-        from industry_analysis import generate_industry_analysis
-        
-        # 調用函數（只傳 session_id）
-        industry_analysis_data = generate_industry_analysis(session_id=session_id)
-        
-        analysis_text = industry_analysis_data.get("industry_analysis", "")
-        analysis_length = len(analysis_text) if analysis_text else 0
-        
-        # 記錄 +1 步驟成功
-        if log_plus1_step:
-            try:
-                log_plus1_step(session_id, "success", {
-                    "analysis_length": analysis_length,
-                    "file_path": f"session_{session_id}_industry_analysis.json"
-                })
-            except:
-                pass
-        
-        st.success(f"✅ 【皇帝路徑】產業別分析已生成並寫入 log（{analysis_length}字）- 這是第一個 LLM 調用")
-    except Exception as e:
-        # 記錄 +1 步驟失敗
-        if log_plus1_step:
-            try:
-                log_plus1_step(session_id, "failed", {
-                    "error": str(e),
-                    "error_type": type(e).__name__
-                })
-            except:
-                pass
-        
-        st.error(f"❌ 【皇帝路徑】產業別分析生成失敗: {e}")
-        st.exception(e)  # 顯示完整錯誤信息
-        st.stop()  # 皇帝路徑失敗，停止後續流程
-    
-    # ========== 皇帝路徑完成，開始生成 TCFD 表格 ==========
+    # ========== 開始生成 TCFD 表格 ==========
     
     # 初始化 Anthropic client（加入錯誤處理）
     try:
@@ -586,6 +514,39 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     
     st.balloons()
     st.session_state.step1_done = True
+    
+    # ========== 【+1 步驟 - 王子路徑：TCFD 5 個表格完成後，第 6 個步驟（只 log，不輸出 pptx）】==========
+    st.info("👑 【王子路徑】正在生成產業別分析（150字）- TCFD 5 個表格完成後的第 6 個步驟...")
+    
+    # 取得 session_id
+    session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+    st.session_state.session_id = session_id
+    
+    try:
+        # 導入 industry_analysis 模組
+        current_file = Path(__file__)  # TCFD generator/pages/1_🌍_碳排與TCFD氣候治理.py
+        base_dir = current_file.parent.parent  # TCFD generator -> ESG--report
+        company_path = base_dir / "company1.1-3.6"
+        
+        # 清除緩存
+        if 'industry_analysis' in sys.modules:
+            del sys.modules['industry_analysis']
+        
+        # 最簡單的導入方式
+        sys.path.insert(0, str(company_path))
+        from industry_analysis import generate_industry_analysis
+        
+        # 調用函數（只傳 session_id）- 只寫入 log，不生成 pptx
+        industry_analysis_data = generate_industry_analysis(session_id=session_id)
+        
+        analysis_text = industry_analysis_data.get("industry_analysis", "")
+        analysis_length = len(analysis_text) if analysis_text else 0
+        
+        st.success(f"✅ 【王子路徑】產業別分析已生成並寫入 log（{analysis_length}字）- 這是第 6 個步驟（只 log，不輸出 pptx）")
+    except Exception as e:
+        # 王子路徑失敗不停止流程，只記錄錯誤
+        st.warning(f"⚠️ 【王子路徑】產業別分析生成失敗（不影響 TCFD 表格）: {e}")
+        # 不調用 st.stop()，讓流程繼續
     
     # 保存 session log
     session_log = {
