@@ -552,10 +552,16 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         analysis_length = len(analysis_text) if analysis_text else 0
         
         # 調試：檢查 log 文件是否存在
-        # 注意：base_dir 已經是 TCFD generator，所以 log_dir 應該是 base_dir / "logs"
-        log_dir = base_dir / "logs"
+        # 注意：industry_analysis.py 中 LOG_FILE_BASE 的計算方式
+        # _current_file = company1.1-3.6/industry_analysis.py
+        # _base_dir = _current_file.parent.parent = ESG--report/
+        # LOG_FILE_BASE = _base_dir / "TCFD generator" / "logs" = ESG--report/TCFD generator/logs
+        # 所以我們需要從 ESG--report 開始計算
+        esg_report_dir = base_dir.parent  # TCFD generator -> ESG--report
+        log_dir = esg_report_dir / "TCFD generator" / "logs"
         log_file = log_dir / f"session_{session_id}_industry_analysis.json"
         st.write(f"[DEBUG] base_dir: {base_dir}")
+        st.write(f"[DEBUG] esg_report_dir: {esg_report_dir}")
         st.write(f"[DEBUG] log_dir: {log_dir} (存在: {log_dir.exists()})")
         st.write(f"[DEBUG] log_file 路徑: {log_file}")
         st.write(f"[DEBUG] log_file 是否存在: {log_file.exists()}")
@@ -564,8 +570,9 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
             st.success(f"✅ 【王子路徑】產業別分析已生成並寫入 log（{analysis_length}字）- 這是第 6 個步驟（只 log，不輸出 pptx）")
             st.write(f"📁 Log 文件位置: {log_file}")
         else:
-            st.error(f"❌ 【王子路徑】Log 文件未找到: {log_file}")
+            st.warning(f"⚠️ 【王子路徑】Log 文件未找到: {log_file}")
             st.write(f"📁 檢查目錄: {log_dir} (存在: {log_dir.exists()})")
+            st.write(f"💡 提示：請檢查 industry_analysis.py 中的 LOG_FILE_BASE 路徑計算")
     except Exception as e:
         # 王子路徑失敗不停止流程，只記錄錯誤
         st.error(f"❌ 【王子路徑】產業別分析生成失敗（不影響 TCFD 表格）: {e}")
