@@ -78,6 +78,38 @@ class PPTContentEngine:
                 continue
         return ""
     
+    def _read_industry_analysis_directly(self) -> str:
+        """
+        直接從 log 文件讀取產業別分析（150字）
+        不經過 JSON 解析和多層轉換，直接讀取字符串
+        """
+        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+        if not log_dir.exists():
+            return ""
+        
+        # 找最新的包含 industry_analysis 的文件
+        for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
+            try:
+                with open(log_file, "r", encoding="utf-8") as f:
+                    content = f.read()
+                
+                # 直接用正則提取 industry_analysis 的值（不解析整個 JSON）
+                import re
+                # 匹配 "industry_analysis": "..." 或 "industry_analysis": """..."""
+                match = re.search(r'"industry_analysis"\s*:\s*"([^"]+)"', content, re.DOTALL)
+                if match:
+                    analysis = match.group(1)
+                    # 處理轉義字符
+                    analysis = analysis.replace('\\n', '\n').replace('\\"', '"').replace('\\/', '/')
+                    if analysis and len(analysis.strip()) > 50:  # 至少 50 字才認為有效
+                        print(f"[產業別分析] 直接從 {log_file.name} 讀取: {len(analysis)}字")
+                        return analysis.strip()
+            except Exception as e:
+                print(f"[WARN] 讀取 {log_file.name} 失敗: {e}")
+                continue
+        
+        return ""
+    
     def _build_industry_first_prompt(self, base_prompt: str, industry: str) -> str:
         """
         產業 Express 通道：構建產業別優先的 prompt
@@ -408,12 +440,14 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_cooperation_info(self) -> str:
-        # 直接使用 log 中的產業別分析（這是所有 LLM 的第一個起始點）
+        # 直接從 log 文件讀取產業別分析（不經過 JSON 解析和多層轉換）
         industry = self.industry
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
         company_context = self.env_context.get("company_context", "") if self.env_context else ""
-        industry_analysis = self.env_context.get("industry_analysis", "") if self.env_context else ""
         tcfd_market = self.env_context.get("tcfd_market_context", "") if self.env_context else ""
+        
+        # 直接讀取 log 文件中的產業別分析（150字）
+        industry_analysis = self._read_industry_analysis_directly()
         
         # 調試：檢查實際值
         print(f"[DEBUG generate_cooperation_info] industry={repr(industry)}")
@@ -425,10 +459,10 @@ class PPTContentEngine:
             prompt = f"【產業別：{industry}】\n\n"
             prompt += f"本公司在{industry}產業營運。所有內容必須緊扣{industry}產業的特性。\n\n"
             
-            # 優先使用產業別分析（這是所有 LLM 的第一個起始點）
+            # 直接插入產業別分析（150字，不經過解析）
             if industry_analysis:
-                prompt += f"【產業別分析】（這是所有分析的基礎）：\n{industry_analysis}\n\n"
-                print(f"[OK] 已加入產業別分析到 prompt")
+                prompt += f"【產業別分析】（這是所有分析的基礎，必須遵守）：\n{industry_analysis}\n\n"
+                print(f"[OK] 已直接插入產業別分析到 prompt（{len(industry_analysis)}字）")
             else:
                 print(f"[WARN] industry_analysis 為空，無法加入")
             
