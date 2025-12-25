@@ -229,6 +229,7 @@ class PPTContentEngine:
             # prompt 已經包含 150 字摘要，直接使用，不再重複添加
             content = prompt
             print(f"[DEBUG _call] prompt 已包含 150 字摘要，直接使用，不重複添加")
+            print(f"[DEBUG _call] 實際傳給 LLM 的 content 前 300 字: {content[:300]}")
         else:
             # prompt 不包含 150 字摘要，需要添加
             if add_system_prompt:
@@ -568,16 +569,38 @@ class PPTContentEngine:
         # 直接硬寫入 150 字摘要到 prompt，確保一定成功
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
         
-        # 構建包含 150 字摘要的完整 prompt
+        # 構建包含 150 字摘要的完整 prompt - 極端強制方式
         if industry_analysis and len(industry_analysis) > 50:
-            full_prompt = f"""【產業別分析（必須遵循）】
+            # 將 150 字摘要放在最前面，作為主要內容，強制 LLM 使用
+            full_prompt = f"""【⚠️ 絕對禁止 - 違反將導致錯誤】
+絕對禁止使用以下任何詞彙或類似表達：
+- 「公司擁有悠久的歷史」
+- 「多年來一直致力於」
+- 「成為各行業的領導者」
+- 「跨國企業」「廣泛的業務版圖」
+- 「致力於成為...領導者」
+- 任何描述歷史、規模、領導地位的通用詞彙
+
+【唯一資料來源 - 必須嚴格遵循】
 {industry_analysis}
 
 【任務】
-請根據上述產業別分析，撰寫 {company_name} 的公司概況。
+基於上述唯一資料來源，撰寫 {company_name} 的公司概況。
 
-【要求】必須基於上述核心資料生成，禁止使用「公司擁有悠久的歷史」「豐富的產業經驗」等通用模板。必須引用核心資料中的具體數據（如年營收、碳排數據、耗能等級等）。"""
-            print(f"[generate_cooperation_info] ✅ 已硬寫入 150 字摘要（長度: {len(industry_analysis)}字）到 prompt")
+【強制要求】
+1. 第一句必須直接引用上述分析中的具體數據或產業資訊，不得使用任何通用開頭
+2. 必須明確提及上述分析中的具體數字：年營收、碳排數據、耗能等級、電費等
+3. 內容必須與上述分析完全一致，不得添加未提及的內容
+4. 不得使用「公司擁有悠久的歷史」「多年來一直致力於」等開頭
+
+【範例錯誤開頭（禁止）】
+❌ {company_name} 公司擁有悠久的歷史，多年來一直致力於成為各行業的領導者...
+❌ 作為一家跨國企業，我們在全球範圍內擁有廣泛的業務版圖...
+
+【正確做法】
+✅ 基於上述分析的具體數據和產業資訊開始寫作"""
+            print(f"[generate_cooperation_info] ✅ 已硬寫入 150 字摘要（長度: {len(industry_analysis)}字），使用極端強制模式")
+            print(f"[generate_cooperation_info] 前 300 字: {full_prompt[:300]}")
         else:
             full_prompt = f"請撰寫 {company_name} 的公司概況。"
             print(f"[generate_cooperation_info] ⚠️ 未找到 150 字摘要，使用簡單 prompt")
