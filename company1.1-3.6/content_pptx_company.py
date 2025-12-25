@@ -34,37 +34,13 @@ class PPTContentEngine:
         self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         self.model = self._resolve_model()
         
-        # 產業別：獨立管線，直接讀取，最優先處理
-        self.industry = self._load_industry_directly()
-        print(f"[產業別管線] 讀取結果: {repr(self.industry)}")
-        
-        # 載入環境段 log 資料（其他資料）
+        # 載入環境段 log 資料
         self.env_log_data = self._load_environment_log()
         self.env_context = get_prompt_context(self.env_log_data)
-    
-    def _load_industry_directly(self) -> str:
-        """
-        獨立管線：直接讀取最新的 Step 1 文件中的產業別
-        不經過任何複雜流程，就這一個目的
-        """
-        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
-        if not log_dir.exists():
-            return ""
         
-        # 找最新的 Step 1 文件
-        for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
-            try:
-                with open(log_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                step = str(data.get("step", "")).lower()
-                if "step 1" in step:
-                    ind = data.get("industry", "")
-                    if ind and str(ind).strip():
-                        print(f"[產業別管線] 從 {log_file.name} 讀取: {ind}")
-                        return str(ind).strip()
-            except:
-                continue
-        return ""
+        # 產業別：直接從 env_context 取得（已經載入了，不需要重新讀文件）
+        self.industry = self.env_context.get("industry", "") if self.env_context else ""
+        print(f"[產業別] 從 env_context 取得: {repr(self.industry)}")
 
     def _resolve_model(self) -> str:
         candidates = []
