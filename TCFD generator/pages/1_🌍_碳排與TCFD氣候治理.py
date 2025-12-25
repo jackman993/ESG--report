@@ -552,8 +552,8 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         analysis_length = len(analysis_text) if analysis_text else 0
         
         # 調試：檢查 log 文件是否存在
-        # 注意：base_dir 是 ESG--report，所以 log_dir 應該是 base_dir / "TCFD generator" / "logs"
-        log_dir = base_dir / "TCFD generator" / "logs"
+        # 注意：base_dir 已經是 TCFD generator，所以 log_dir 應該是 base_dir / "logs"
+        log_dir = base_dir / "logs"
         log_file = log_dir / f"session_{session_id}_industry_analysis.json"
         st.write(f"[DEBUG] base_dir: {base_dir}")
         st.write(f"[DEBUG] log_dir: {log_dir} (存在: {log_dir.exists()})")
