@@ -224,14 +224,17 @@ class PPTContentEngine:
         
         if add_system_prompt:
             if is_chinese:
-                # 中文：將英文單字數轉換為中文字數
-                char_count = int(word_count * CHINESE_CHAR_COUNT_MULTIPLIER)
-                content = f"{industry_prefix}請用繁體中文撰寫約 {char_count} 字（對應 {word_count} 英文單字）。\n\n{prompt}"
+                # 移除催眠咒語「請用繁體中文撰寫約 X 字」，直接使用 prompt
+                content = f"""{industry_prefix}{prompt}
+
+【要求】必須基於上述核心資料生成，禁止使用「公司擁有悠久的歷史」「豐富的產業經驗」等通用模板。必須引用核心資料中的具體數據。"""
             else:
-                content = f"{industry_prefix}Respond in English with exactly {word_count} words.\n\n{prompt}"
+                content = f"{industry_prefix}{prompt}\n\n【要求】Must be based on the core data above, no generic templates. Must cite specific data from the core data."
         else:
-            # 直接使用 prompt，但仍在前段硬插入 150 字摘要
-            content = f"{industry_prefix}{prompt}"
+            # 直接使用 prompt，但仍在前段硬插入 150 字摘要，並添加禁止模板的要求
+            content = f"""{industry_prefix}{prompt}
+
+【要求】必須基於上述核心資料生成，禁止使用「公司擁有悠久的歷史」「豐富的產業經驗」等通用模板。必須引用核心資料中的具體數據。"""
             print(f"[DEBUG _call] add_system_prompt=False，但已硬插入 150 字摘要，總長度={len(content)}字")
         
         # 簡單檢查 prompt 是否包含產業別
