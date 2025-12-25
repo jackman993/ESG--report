@@ -122,10 +122,13 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
     emission_total_tco2e = _load_emission_data_from_log(session_id)
     
     # 構建 prompt（包含碳排數據）
+    # 處理 monthly_electricity_bill_ntd 可能為 None 的情況
+    monthly_bill_display = monthly_electricity_bill_ntd if monthly_electricity_bill_ntd and monthly_electricity_bill_ntd > 0 else 0.0
+    
     prompt = f"""請根據以下資訊，撰寫約 150 字的產業別分析：
 
 產業別：{industry}
-月電費：{monthly_electricity_bill_ntd:,.0f} NTD"""
+月電費：{monthly_bill_display:,.0f} NTD"""
     
     # 如果有碳排數據，加入 prompt
     if emission_total_tco2e and emission_total_tco2e > 0:
