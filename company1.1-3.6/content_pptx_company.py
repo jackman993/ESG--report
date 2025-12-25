@@ -415,32 +415,41 @@ class PPTContentEngine:
         industry_analysis = self.env_context.get("industry_analysis", "") if self.env_context else ""
         tcfd_market = self.env_context.get("tcfd_market_context", "") if self.env_context else ""
         
-        # 構建基礎 prompt
-        base_prompt = self._format_expert_intro(company_name, industry)
-        base_prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
+        # 調試：檢查實際值
+        print(f"[DEBUG generate_cooperation_info] industry={repr(industry)}")
+        print(f"[DEBUG generate_cooperation_info] industry_analysis 長度={len(industry_analysis) if industry_analysis else 0}")
+        print(f"[DEBUG generate_cooperation_info] industry_analysis 前100字={industry_analysis[:100] if industry_analysis else 'None'}")
         
+        # 產業別優先：放在最前面，不能被其他內容蓋過
         if industry:
-            base_prompt += f"\n\n【重要】在第一句中使用 {{COMPANY_NAME}} 作為公司名稱的佔位符，並明確提及{industry}產業。"
-            base_prompt += f"例如，以「{{COMPANY_NAME}} 是一家{industry}公司，擁有豐富的歷史...」或「{{COMPANY_NAME}} 在{industry}產業深耕多年...」開頭。"
-            base_prompt += f"\n\n【必須遵守】請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
-            base_prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
+            prompt = f"【產業別：{industry}】\n\n"
+            prompt += f"本公司在{industry}產業營運。所有內容必須緊扣{industry}產業的特性。\n\n"
+            
+            # 優先使用產業別分析（這是所有 LLM 的第一個起始點）
+            if industry_analysis:
+                prompt += f"【產業別分析】（這是所有分析的基礎）：\n{industry_analysis}\n\n"
+                print(f"[OK] 已加入產業別分析到 prompt")
+            else:
+                print(f"[WARN] industry_analysis 為空，無法加入")
+            
+            prompt += self._format_expert_intro(company_name, industry)
+            prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
+            prompt += f"\n\n【必須遵守】在第一句中使用 {{COMPANY_NAME}} 作為公司名稱的佔位符，並明確提及{industry}產業。"
+            prompt += f"例如，以「{{COMPANY_NAME}} 是一家{industry}公司，擁有豐富的歷史...」或「{{COMPANY_NAME}} 在{industry}產業深耕多年...」開頭。"
+            prompt += f"\n\n【必須遵守】請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+            prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
         else:
-            base_prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
-            base_prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
-            base_prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+            prompt = self._format_expert_intro(company_name, industry)
+            prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
+            prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
+            prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
+            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+            if company_context:
+                prompt += f"\n\n公司背景：{company_context}"
         
-        # 產業 Express 通道：構建產業別優先的 prompt
-        prompt = self._build_industry_first_prompt(base_prompt, industry)
-        
-        prompt += "總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
+        prompt += "\n\n總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
-        
-        # 優先使用產業別分析（這是所有 LLM 的第一個起始點）
-        if industry_analysis:
-            prompt += f"\n\n【產業別分析】（這是所有分析的基礎）：\n{industry_analysis}"
-        elif company_context:
-            prompt += f"\n\n公司背景：{company_context}"
         
         if industry:
             prompt += f"\n\n產業別：{industry}"
