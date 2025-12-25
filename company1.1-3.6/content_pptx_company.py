@@ -468,7 +468,7 @@ class PPTContentEngine:
 
     # --- Company section additions (中文版) ---
     def generate_ceo_message(self) -> str:
-        # 直接讀取 150 字分析（硬編碼到 content.py）
+        # 直接讀取 150 字分析
         industry_analysis = self._read_industry_analysis_express()
         
         # 如果讀取失敗，使用硬編碼的 150 字分析（從 log 文件複製）
@@ -481,24 +481,12 @@ class PPTContentEngine:
         
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
         
-        # 修改舊 prompt：硬插入 150 字分析
-        prompt = f"""【⚠️ 最高優先級 - 產業別分析（必須嚴格遵守，不可違反）】
-以下產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離：
+        # 刪除所有模板 prompt，只保留 150 字分析和基本任務
+        prompt = f"""{industry_analysis}
 
-{industry_analysis}
-
-【任務】
-請根據上述產業別分析，撰寫約 330 字（對應 220 英文單字）的 CEO 訊息，用於 ESG 永續報告書。
-
-【⚠️ 強制要求（必須遵守）】
-1. 平衡啟發性與責任感：歡迎讀者、概述永續願景、強調近期 ESG 成就、承認仍面臨的挑戰，並呼籲利害關係人共同參與轉型旅程
-2. 【必須】引用上述產業別分析中的具體數據（如年營收、碳排數據、耗能等級等），不得忽略或抽象化
-3. 【必須】內容與上述產業別分析完全一致，不得產生矛盾
-4. 使用「我們」和「本公司」，保持溫暖且專業的語調，避免元評論
-5. 第一句使用公司名稱：{company_name}
-
-【⚠️ 再次提醒】
-上述產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離。"""
+請根據上述產業別分析，撰寫 {company_name} 的 CEO 訊息（約 330 字）。"""
+        
+        print(f"[generate_ceo_message] ✅ 極簡 prompt，150字分析長度={len(industry_analysis)}字")
         
         return self._call(prompt, word_count=220, is_chinese=True)
 
@@ -551,17 +539,14 @@ class PPTContentEngine:
             industry_analysis = """鋁建材業面臨嚴格的環保法規，包括空氣污染防制法及循環經濟相關規範，要求提升製程效率並減少廢料產生。市場趨勢朝向綠建築材料發展，鋁材因其可回收性及輕量化特性，在建築節能應用上需求持續成長。然而，鋁材製造屬能源密集型產業，面臨電力成本上漲及碳稅政策風險。月電費50,000元顯示該企業具一定生產規模，年碳排放總額71.10 tCO₂e相對較低，反映可能採用較環保的製程技術或生產規模適中。產業轉型壓力下，企業需投資節能設備及再生能源，並強化供應鏈碳管理。基於電費水準及產業特性判斷，此為中等耗能企業。耗能等級：中耗能。估算年營收：30,000,000 NTD。年碳排放總額：71.10 tCO₂e"""
             print(f"[generate_cooperation_info] 方法3：使用硬編碼的 150 字分析（長度: {len(industry_analysis)}字）")
         
-        # 硬寫入 150 字分析到 prompt（確保優先級）
-        prompt = f"""以下產業別分析：
+        # 刪除所有模板 prompt，只保留 150 字分析和基本任務
+        prompt = f"""{industry_analysis}
 
-{industry_analysis}
-
-請根據上述產業別分析，撰寫描述 {company_name} 的合作概況。"""
+請根據上述產業別分析，撰寫 {company_name} 的公司概況（約 345 字）。"""
         
-        print(f"[generate_cooperation_info] ✅ 最終 prompt 長度: {len(prompt)}字")
-        print(f"[generate_cooperation_info] ✅ 150字分析是否在 prompt 中: {'是' if industry_analysis in prompt else '否'}")
-        print(f"[generate_cooperation_info] ✅ prompt 前 300 字:")
-        print(prompt[:300])
+        print(f"[generate_cooperation_info] ✅ 極簡 prompt，150字分析長度={len(industry_analysis)}字")
+        print(f"[generate_cooperation_info] ✅ prompt 內容:")
+        print(prompt)
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
