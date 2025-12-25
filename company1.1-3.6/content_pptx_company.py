@@ -222,20 +222,29 @@ class PPTContentEngine:
         else:
             industry_prefix = ""
         
-        if add_system_prompt:
-            if is_chinese:
-                # 移除催眠咒語「請用繁體中文撰寫約 X 字」，直接使用 prompt
+        # 檢查 prompt 是否已經包含 150 字摘要
+        prompt_has_analysis = "【產業別分析" in prompt or "【核心資料" in prompt or "產業別分析（必須遵循）" in prompt
+        
+        if prompt_has_analysis:
+            # prompt 已經包含 150 字摘要，直接使用，不再重複添加
+            content = prompt
+            print(f"[DEBUG _call] prompt 已包含 150 字摘要，直接使用，不重複添加")
+        else:
+            # prompt 不包含 150 字摘要，需要添加
+            if add_system_prompt:
+                if is_chinese:
+                    # 移除催眠咒語「請用繁體中文撰寫約 X 字」，直接使用 prompt + 要求
+                    content = f"""{industry_prefix}{prompt}
+
+【要求】必須基於上述核心資料生成，禁止使用「公司擁有悠久的歷史」「豐富的產業經驗」等通用模板。必須引用核心資料中的具體數據。"""
+                else:
+                    content = f"{industry_prefix}{prompt}\n\n【要求】Must be based on the core data above, no generic templates. Must cite specific data from the core data."
+            else:
+                # add_system_prompt=False，但仍需要添加 150 字摘要和要求
                 content = f"""{industry_prefix}{prompt}
 
 【要求】必須基於上述核心資料生成，禁止使用「公司擁有悠久的歷史」「豐富的產業經驗」等通用模板。必須引用核心資料中的具體數據。"""
-            else:
-                content = f"{industry_prefix}{prompt}\n\n【要求】Must be based on the core data above, no generic templates. Must cite specific data from the core data."
-        else:
-            # 直接使用 prompt，但仍在前段硬插入 150 字摘要，並添加禁止模板的要求
-            content = f"""{industry_prefix}{prompt}
-
-【要求】必須基於上述核心資料生成，禁止使用「公司擁有悠久的歷史」「豐富的產業經驗」等通用模板。必須引用核心資料中的具體數據。"""
-            print(f"[DEBUG _call] add_system_prompt=False，但已硬插入 150 字摘要，總長度={len(content)}字")
+                print(f"[DEBUG _call] add_system_prompt=False，已硬插入 150 字摘要，總長度={len(content)}字")
         
         # 簡單檢查 prompt 是否包含產業別
         if "產業" in prompt or industry_analysis:
@@ -556,15 +565,25 @@ class PPTContentEngine:
             industry_analysis = """鋁建材業面臨嚴格的環保法規，包括空氣污染防制法及循環經濟相關規範，要求提升製程效率並減少廢料產生。市場趨勢朝向綠建築材料發展，鋁材因其可回收性及輕量化特性，在建築節能應用上需求持續成長。然而，鋁材製造屬能源密集型產業，面臨電力成本上漲及碳稅政策風險。月電費50,000元顯示該企業具一定生產規模，年碳排放總額71.10 tCO₂e相對較低，反映可能採用較環保的製程技術或生產規模適中。產業轉型壓力下，企業需投資節能設備及再生能源，並強化供應鏈碳管理。基於電費水準及產業特性判斷，此為中等耗能企業。耗能等級：中耗能。估算年營收：30,000,000 NTD。年碳排放總額：71.10 tCO₂e"""
             print(f"[generate_cooperation_info] 方法3：使用硬編碼的 150 字分析（長度: {len(industry_analysis)}字）")
         
-        # _call() 已自動在前段硬插入 150 字摘要，這裡只需要傳任務描述
+        # 直接硬寫入 150 字摘要到 prompt，確保一定成功
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
-        task_prompt = f"請根據上述產業別分析，撰寫 {company_name} 的公司概況。"
         
-        print(f"[generate_cooperation_info] ✅ _call() 會自動在前段硬插入 150 字摘要")
-        print(f"[generate_cooperation_info] ✅ 任務 prompt: {task_prompt}")
+        # 構建包含 150 字摘要的完整 prompt
+        if industry_analysis and len(industry_analysis) > 50:
+            full_prompt = f"""【產業別分析（必須遵循）】
+{industry_analysis}
+
+【任務】
+請根據上述產業別分析，撰寫 {company_name} 的公司概況。
+
+【要求】必須基於上述核心資料生成，禁止使用「公司擁有悠久的歷史」「豐富的產業經驗」等通用模板。必須引用核心資料中的具體數據（如年營收、碳排數據、耗能等級等）。"""
+            print(f"[generate_cooperation_info] ✅ 已硬寫入 150 字摘要（長度: {len(industry_analysis)}字）到 prompt")
+        else:
+            full_prompt = f"請撰寫 {company_name} 的公司概況。"
+            print(f"[generate_cooperation_info] ⚠️ 未找到 150 字摘要，使用簡單 prompt")
         
-        # 調用 LLM，_call() 會自動在前段硬插入 150 字摘要
-        return self._call(task_prompt, word_count=230, is_chinese=True, add_system_prompt=False)
+        # 調用 LLM，直接傳入包含 150 字摘要的完整 prompt
+        return self._call(full_prompt, word_count=230, is_chinese=True, add_system_prompt=False)
 
     def generate_cooperation_financial(self) -> str:
         # 整合環境段 log 資料（營收資訊）
