@@ -526,14 +526,30 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         # 導入 industry_analysis 模組
         current_file = Path(__file__)  # TCFD generator/pages/1_🌍_碳排與TCFD氣候治理.py
         base_dir = current_file.parent.parent  # TCFD generator -> ESG--report
-        company_path = base_dir / "company1.1-3.6"
+        
+        # 嘗試多種路徑計算方式（兼容本地和 Streamlit Cloud）
+        possible_paths = [
+            base_dir / "company1.1-3.6",  # 從 TCFD generator 向上到根目錄
+            Path.cwd() / "company1.1-3.6",  # 從當前工作目錄
+            current_file.parent.parent.parent / "company1.1-3.6",  # 如果 base_dir 計算錯誤
+        ]
+        
+        company_path = None
+        for path in possible_paths:
+            if path.exists() and (path / "industry_analysis.py").exists():
+                company_path = path
+                break
+        
+        if company_path is None:
+            raise ImportError(f"找不到 company1.1-3.6 目錄。嘗試的路徑: {[str(p) for p in possible_paths]}")
         
         # 清除緩存
         if 'industry_analysis' in sys.modules:
             del sys.modules['industry_analysis']
         
         # 最簡單的導入方式
-        sys.path.insert(0, str(company_path))
+        if str(company_path) not in sys.path:
+            sys.path.insert(0, str(company_path))
         from industry_analysis import generate_industry_analysis, LOG_FILE_BASE
         
         # 調用函數（傳入 session_id、API_KEY 和 model）- 只寫入 log，不生成 pptx
