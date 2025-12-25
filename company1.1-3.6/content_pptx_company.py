@@ -80,30 +80,44 @@ class PPTContentEngine:
     
     def _read_industry_analysis_directly(self) -> str:
         """
-        直接從 log 文件讀取產業別分析（150字）
-        不經過 JSON 解析和多層轉換，直接讀取字符串
+        直接從 log 文件讀取產業別分析（整段 150 字）
+        完整解析 JSON，讀取整段 LLM 回應，不做正則抽取
         """
         log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
         if not log_dir.exists():
             return ""
         
-        # 找最新的包含 industry_analysis 的文件
-        for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
+        # 優先找 industry_analysis.json 文件
+        industry_analysis_files = sorted(
+            log_dir.glob("session_*_industry_analysis.json"),
+            key=lambda f: f.stat().st_mtime,
+            reverse=True
+        )
+        
+        # 如果沒有專門的 industry_analysis.json，則從所有 json 文件中找
+        if not industry_analysis_files:
+            all_json_files = sorted(
+                log_dir.glob("*.json"),
+                key=lambda f: f.stat().st_mtime,
+                reverse=True
+            )
+        else:
+            all_json_files = industry_analysis_files
+        
+        # 從最新的文件開始讀取
+        for log_file in all_json_files:
             try:
                 with open(log_file, "r", encoding="utf-8") as f:
-                    content = f.read()
+                    data = json.load(f)  # 完整解析 JSON
                 
-                # 直接用正則提取 industry_analysis 的值（不解析整個 JSON）
-                import re
-                # 匹配 "industry_analysis": "..." 或 "industry_analysis": """..."""
-                match = re.search(r'"industry_analysis"\s*:\s*"([^"]+)"', content, re.DOTALL)
-                if match:
-                    analysis = match.group(1)
-                    # 處理轉義字符
-                    analysis = analysis.replace('\\n', '\n').replace('\\"', '"').replace('\\/', '/')
-                    if analysis and len(analysis.strip()) > 50:  # 至少 50 字才認為有效
-                        print(f"[產業別分析] 直接從 {log_file.name} 讀取: {len(analysis)}字")
-                        return analysis.strip()
+                # 直接讀取 industry_analysis 字段（整段 150 字）
+                industry_analysis = data.get("industry_analysis", "")
+                
+                if industry_analysis and isinstance(industry_analysis, str):
+                    analysis_text = industry_analysis.strip()
+                    if len(analysis_text) > 50:  # 至少 50 字才認為有效
+                        print(f"[產業別分析] 從 {log_file.name} 讀取整段: {len(analysis_text)}字")
+                        return analysis_text
             except Exception as e:
                 print(f"[WARN] 讀取 {log_file.name} 失敗: {e}")
                 continue

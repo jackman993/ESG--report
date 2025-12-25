@@ -118,7 +118,10 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
 def save_industry_analysis_to_log(data: Dict[str, Any]) -> None:
     """
     將產業別分析硬寫入 log 文件
+    確保整段 150 字 LLM 回應全部寫入
     """
+    import os
+    
     log_dir = DEFAULT_LOG_DIR
     log_dir.mkdir(parents=True, exist_ok=True)
     
@@ -131,15 +134,19 @@ def save_industry_analysis_to_log(data: Dict[str, Any]) -> None:
         try:
             with open(log_file, "r", encoding="utf-8") as f:
                 existing_data = json.load(f)
-            # 合併數據（產業別分析優先）
+            # 合併數據（產業別分析優先，確保新的 150 字覆蓋舊的）
             existing_data.update(data)
             data = existing_data
         except:
             pass
     
-    # 寫入文件
-    with open(log_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    
-    print(f"[產業別分析] 已寫入 log: {log_file.name}")
+    # 硬寫入文件：確保整段 150 字全部寫入
+    try:
+        with open(log_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+            f.flush()  # 強制刷新緩衝區
+            os.fsync(f.fileno())  # 強制寫入磁盤
+        print(f"[產業別分析] 已硬寫入 log: {log_file.name} (整段 {len(data.get('industry_analysis', ''))} 字)")
+    except Exception as e:
+        raise Exception(f"硬寫入產業別分析 log 失敗: {e}")
 
