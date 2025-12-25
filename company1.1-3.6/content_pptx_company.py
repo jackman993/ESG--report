@@ -78,51 +78,44 @@ class PPTContentEngine:
                 continue
         return ""
     
-    def _read_industry_analysis_directly(self) -> str:
+    def _read_industry_analysis_express(self) -> str:
         """
-        直接從 log 文件讀取產業別分析（整段 150 字）
-        完整解析 JSON，讀取整段 LLM 回應，不做正則抽取
+        Express 通道：直接從 +1 步驟生成的 150 字分析文件讀取（絕對路徑，不抽象）
+        只讀取 150 字分析，不抽取產業別
         """
         log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
         if not log_dir.exists():
             return ""
         
-        # 優先找 industry_analysis.json 文件
+        # 直接讀取最新的 industry_analysis.json 文件（+1 步驟生成的）
         industry_analysis_files = sorted(
             log_dir.glob("session_*_industry_analysis.json"),
             key=lambda f: f.stat().st_mtime,
             reverse=True
         )
         
-        # 如果沒有專門的 industry_analysis.json，則從所有 json 文件中找
         if not industry_analysis_files:
-            all_json_files = sorted(
-                log_dir.glob("*.json"),
-                key=lambda f: f.stat().st_mtime,
-                reverse=True
-            )
-        else:
-            all_json_files = industry_analysis_files
+            print(f"[Express] 找不到 industry_analysis.json 文件")
+            return ""
         
-        # 從最新的文件開始讀取
-        for log_file in all_json_files:
-            try:
-                with open(log_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)  # 完整解析 JSON
-                
-                # 直接讀取 industry_analysis 字段（整段 150 字）
-                industry_analysis = data.get("industry_analysis", "")
-                
-                if industry_analysis and isinstance(industry_analysis, str):
-                    analysis_text = industry_analysis.strip()
-                    if len(analysis_text) > 50:  # 至少 50 字才認為有效
-                        print(f"[產業別分析] 從 {log_file.name} 讀取整段: {len(analysis_text)}字")
-                        return analysis_text
-            except Exception as e:
-                print(f"[WARN] 讀取 {log_file.name} 失敗: {e}")
-                continue
-        
-        return ""
+        # 讀取最新的文件（絕對路徑）
+        log_file = industry_analysis_files[0]
+        try:
+            with open(log_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            # 只讀取 150 字分析，不抽取產業別
+            industry_analysis = data.get("industry_analysis", "").strip()
+            
+            if industry_analysis and len(industry_analysis) > 50:
+                print(f"[Express] 從 {log_file.name} 讀取 150 字分析: {len(industry_analysis)}字")
+                return industry_analysis
+            else:
+                print(f"[Express] {log_file.name} 中沒有有效的 150 字分析")
+                return ""
+        except Exception as e:
+            print(f"[Express] 讀取 {log_file.name} 失敗: {e}")
+            return ""
     
     def _build_industry_first_prompt(self, base_prompt: str, industry: str) -> str:
         """
@@ -454,21 +447,17 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_cooperation_info(self) -> str:
-        # 直接從 log 文件讀取產業別分析（不經過 JSON 解析和多層轉換）
-        industry = self.industry
+        # Express 通道：直接從 +1 步驟生成的 150 字分析文件讀取（不抽取產業別）
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
-        company_context = self.env_context.get("company_context", "") if self.env_context else ""
-        tcfd_market = self.env_context.get("tcfd_market_context", "") if self.env_context else ""
         
-        # 直接讀取 log 文件中的產業別分析（150字）- 硬寫入，無條件判斷
-        industry_analysis = self._read_industry_analysis_directly()
+        # 直接讀取 150 字分析（Express 通道，絕對路徑，不抽象）
+        industry_analysis = self._read_industry_analysis_express()
         
         # 調試：檢查實際值
-        print(f"[DEBUG generate_cooperation_info] industry={repr(industry)}")
-        print(f"[DEBUG generate_cooperation_info] industry_analysis 長度={len(industry_analysis) if industry_analysis else 0}")
-        print(f"[DEBUG generate_cooperation_info] industry_analysis 前100字={industry_analysis[:100] if industry_analysis else 'None'}")
+        print(f"[Express generate_cooperation_info] 150字分析長度={len(industry_analysis) if industry_analysis else 0}")
+        print(f"[Express generate_cooperation_info] 150字分析前100字={industry_analysis[:100] if industry_analysis else 'None'}")
         
-        # 只有一個 prompt，硬寫入 150 字分析（無 if/else，無選擇）
+        # 只有一個 prompt，直接硬寫入 150 字分析（無 if/else，無選擇，不抽取產業別）
         prompt = f"""【⚠️ 最高優先級 - 產業別分析（必須嚴格遵守，不可違反）】
 以下產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離：
 
@@ -486,12 +475,11 @@ class PPTContentEngine:
 
 【公司資訊】
 公司名稱：{company_name}
-產業別：{industry if industry else '未指定'}
 
 【⚠️ 再次提醒】
 上述產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離。"""
         
-        print(f"[OK] 150字硬寫入 prompt（{len(industry_analysis) if industry_analysis else 0}字），無條件判斷，只有一個 prompt")
+        print(f"[Express OK] 150字硬寫入 prompt（{len(industry_analysis) if industry_analysis else 0}字），無條件判斷，只有一個 prompt，不抽取產業別")
         
         # 最後檢查 prompt 是否包含產業別
         print(f"\n{'='*60}")
