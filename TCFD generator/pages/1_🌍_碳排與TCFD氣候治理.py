@@ -426,17 +426,9 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         sys.path.insert(0, str(company_path))
         from industry_analysis import generate_industry_analysis
         
-        # 取得月電費
-        monthly_bill_value = company_profile.get("monthly_bill_ntd", monthly_bill)
-        if not monthly_bill_value:
-            monthly_bill_value = company_profile.get("monthly_electricity_bill_ntd", monthly_bill)
-        
-        # 調用 generate_industry_analysis() 生成 150 字分析（皇帝路徑）
-        industry_analysis_data = generate_industry_analysis(
-            industry=industry,
-            monthly_electricity_bill_ntd=monthly_bill_value,
-            session_id=session_id
-        )
+        # 調用 generate_industry_analysis() 生成 150 字分析（皇帝路徑 - 簡化引擎）
+        # 只傳 session_id，所有數據從 log 讀取
+        industry_analysis_data = generate_industry_analysis(session_id=session_id)
         
         analysis_text = industry_analysis_data.get("industry_analysis", "")
         analysis_length = len(analysis_text) if analysis_text else 0

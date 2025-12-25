@@ -141,15 +141,13 @@ def _load_industry_from_log(session_id: str) -> Optional[str]:
     return None
 
 
-def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: float, session_id: str) -> Dict[str, Any]:
+def generate_industry_analysis(session_id: str) -> Dict[str, Any]:
     """
-    生成產業別分析（150字）
-    這是所有 LLM 調用的第一個，生成基礎數據
-    會從前階段的 log 讀取碳排數據和月電費（明確路徑），確保分析包含具體數據
+    生成產業別分析（150字）- 簡化引擎
+    只從 log 讀取數據，不接收參數，不給預設值
+    如果數據不存在，直接報錯
     
     Args:
-        industry: 產業別
-        monthly_electricity_bill_ntd: 月電費（NTD，如果為 0 則從 log 讀取）
         session_id: Session ID
     
     Returns:
@@ -159,39 +157,27 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
         raise RuntimeError("ANTHROPIC_API_KEY is not configured.")
     
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    
-    # 解析模型
     model = CLAUDE_MODEL if CLAUDE_MODEL else "claude-3-haiku-20240307"
     
-    # 從 log 讀取所有數據（產業別、月電費、碳排數據）
-    # 優先從 log 讀取，如果 log 中有數據則使用 log 的數據
-    industry_from_log = _load_industry_from_log(session_id)
-    if industry_from_log:
-        industry = industry_from_log
-        print(f"[產業別分析] 使用 log 中的產業別: {industry}")
+    # 從 log 讀取所有數據（不給預設值，不存在就報錯）
+    industry = _load_industry_from_log(session_id)
+    if not industry:
+        raise ValueError(f"無法從 log 讀取產業別（session_id: {session_id}）")
     
-    # 從 log 讀取月電費（明確路徑）
-    monthly_bill_from_log = _load_monthly_bill_from_log(session_id)
-    if monthly_bill_from_log:
-        monthly_electricity_bill_ntd = monthly_bill_from_log
-        print(f"[產業別分析] 使用 log 中的月電費: {monthly_bill_from_log:,.0f} NTD")
-    elif not monthly_electricity_bill_ntd or monthly_electricity_bill_ntd == 0:
-        print(f"[WARN] 月電費為空或 0，且 log 中沒有找到月電費數據")
+    monthly_electricity_bill_ntd = _load_monthly_bill_from_log(session_id)
+    if not monthly_electricity_bill_ntd:
+        raise ValueError(f"無法從 log 讀取月電費（session_id: {session_id}）")
     
-    # 從 log 讀取碳排數據（明確路徑）
     emission_total_tco2e = _load_emission_data_from_log(session_id)
+    # 碳排數據可選，不報錯
     
-    # 構建 prompt（包含碳排數據）
-    # 處理 monthly_electricity_bill_ntd 可能為 None 的情況
-    monthly_bill_display = monthly_electricity_bill_ntd if monthly_electricity_bill_ntd and monthly_electricity_bill_ntd > 0 else 0.0
-    
+    # 構建 prompt（簡化，只使用實際數據）
     prompt = f"""請根據以下資訊，撰寫約 150 字的產業別分析：
 
 產業別：{industry}
-月電費：{monthly_bill_display:,.0f} NTD"""
+月電費：{monthly_electricity_bill_ntd:,.0f} NTD"""
     
-    # 如果有碳排數據，加入 prompt
-    if emission_total_tco2e and emission_total_tco2e > 0:
+    if emission_total_tco2e:
         prompt += f"""
 年碳排放總額：{emission_total_tco2e:.2f} tCO₂e"""
     
@@ -208,8 +194,7 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
    - 低耗能：月電費 × 1200倍
    請根據產業特性和耗能等級，估算並明確標示年營收數值"""
     
-    # 如果有碳排數據，要求 LLM 在分析中包含
-    if emission_total_tco2e and emission_total_tco2e > 0:
+    if emission_total_tco2e:
         prompt += f"""
 6. 【必須包含】年碳排放總額：{emission_total_tco2e:.2f} tCO₂e（必須在分析中明確提及此具體數據）"""
     
@@ -219,16 +204,11 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
 - 耗能等級：[高耗能/中耗能/低耗能]
 - 估算年營收：[數值] NTD（LLM 根據耗能等級估算，不顯示計算過程，只顯示結果）"""
     
-    if emission_total_tco2e and emission_total_tco2e > 0:
+    if emission_total_tco2e:
         prompt += f"""
 - 年碳排放總額：{emission_total_tco2e:.2f} tCO₂e（必須明確標示）"""
     
-    # 格式範例（處理 emission_total_tco2e 可能為 None 的情況）
-    if emission_total_tco2e and emission_total_tco2e > 0:
-        emission_example = f"{emission_total_tco2e:.2f} tCO₂e"
-    else:
-        emission_example = "XX.XX tCO₂e"
-    
+    emission_example = f"{emission_total_tco2e:.2f} tCO₂e" if emission_total_tco2e else "XX.XX tCO₂e"
     prompt += f"""
 
 格式範例：
