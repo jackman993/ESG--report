@@ -80,72 +80,80 @@ class PPTContentEngine:
     
     def _read_industry_analysis_express(self) -> str:
         """
-        Express 通道：直接從 +1 步驟生成的 150 字分析文件讀取（統一使用 TCFD generator/logs）
+        Express 通道：直接從 +1 步驟生成的 150 字分析文件讀取
+        使用與 generate_report_summary() 相同的路徑，確保一致性
         只讀取 150 字分析，不抽取產業別
         """
-        # 統一使用與 industry_analysis.py 相同的路徑計算方式
+        import json
         from pathlib import Path
-        _current_file = Path(__file__)  # company1.1-3.6/content_pptx_company.py
-        _base_dir = _current_file.parent.parent  # ESG--report/
-        log_dir = _base_dir / "TCFD generator" / "logs"
         
-        print(f"[Express _read_industry_analysis_express] 開始讀取")
-        print(f"[Express] _current_file: {_current_file}")
-        print(f"[Express] _base_dir: {_base_dir}")
-        print(f"[Express] log_dir: {log_dir}")
+        # 方法1：使用與 generate_report_summary() 相同的路徑（UI 摘要成功使用的路徑）
+        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+        print(f"[Express _read_industry_analysis_express] 方法1: 使用 UI 摘要路徑: {log_dir}")
         print(f"[Express] log_dir.exists(): {log_dir.exists()}")
         
-        if not log_dir.exists():
-            print(f"[Express] ❌ Log 目錄不存在: {log_dir}")
-            return ""
-        
-        # 直接讀取最新的 industry_analysis.json 文件（+1 步驟生成的）
-        industry_analysis_files = list(log_dir.glob("session_*_industry_analysis.json"))
-        print(f"[Express] 找到 {len(industry_analysis_files)} 個 industry_analysis.json 文件")
-        
-        if not industry_analysis_files:
-            print(f"[Express] ❌ 找不到 industry_analysis.json 文件（在 {log_dir}）")
-            # 列出目錄中的所有文件，方便調試
-            all_files = list(log_dir.glob("*.json"))
-            print(f"[Express] 目錄中的所有 JSON 文件: {[f.name for f in all_files]}")
-            return ""
-        
-        # 按修改時間排序，取最新的
-        industry_analysis_files = sorted(
-            industry_analysis_files,
-            key=lambda f: f.stat().st_mtime,
-            reverse=True
-        )
-        
-        # 讀取最新的文件
-        log_file = industry_analysis_files[0]
-        print(f"[Express] 讀取最新文件: {log_file.name}")
-        print(f"[Express] 文件完整路徑: {log_file}")
-        print(f"[Express] 文件存在: {log_file.exists()}")
-        
-        try:
-            with open(log_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
+        if log_dir.exists():
+            # 嘗試從 session_id 讀取
+            session_id = self.env_context.get("session_id", "") if self.env_context else ""
+            if session_id:
+                log_file = log_dir / f"session_{session_id}_industry_analysis.json"
+                print(f"[Express] 嘗試讀取 session_id 文件: {log_file}")
+                if log_file.exists():
+                    try:
+                        with open(log_file, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                        industry_analysis = data.get("industry_analysis", "").strip()
+                        if industry_analysis and len(industry_analysis) > 50:
+                            print(f"[Express] ✅ 方法1成功: 從 {log_file.name} 讀取 {len(industry_analysis)}字")
+                            return industry_analysis
+                    except Exception as e:
+                        print(f"[Express] 方法1讀取 session_id 文件失敗: {e}")
             
-            print(f"[Express] JSON 文件讀取成功，keys: {list(data.keys())}")
-            
-            # 只讀取 150 字分析，不抽取產業別
-            industry_analysis = data.get("industry_analysis", "").strip()
-            
-            print(f"[Express] industry_analysis 長度: {len(industry_analysis) if industry_analysis else 0}")
-            print(f"[Express] industry_analysis 前100字: {industry_analysis[:100] if industry_analysis else 'None'}")
-            
-            if industry_analysis and len(industry_analysis) > 50:
-                print(f"[Express] ✅ 從 {log_file.name} 讀取 150 字分析成功: {len(industry_analysis)}字")
-                return industry_analysis
-            else:
-                print(f"[Express] ❌ {log_file.name} 中沒有有效的 150 字分析（長度: {len(industry_analysis) if industry_analysis else 0}）")
-                return ""
-        except Exception as e:
-            print(f"[Express] ❌ 讀取 {log_file.name} 失敗: {e}")
-            import traceback
-            print(f"[Express] 錯誤堆棧: {traceback.format_exc()}")
-            return ""
+            # 如果沒有 session_id 或讀取失敗，讀取最新的文件
+            industry_analysis_files = sorted(
+                log_dir.glob("session_*_industry_analysis.json"),
+                key=lambda f: f.stat().st_mtime,
+                reverse=True
+            )
+            if industry_analysis_files:
+                log_file = industry_analysis_files[0]
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    industry_analysis = data.get("industry_analysis", "").strip()
+                    if industry_analysis and len(industry_analysis) > 50:
+                        print(f"[Express] ✅ 方法1成功: 從最新文件 {log_file.name} 讀取 {len(industry_analysis)}字")
+                        return industry_analysis
+                except Exception as e:
+                    print(f"[Express] 方法1讀取最新文件失敗: {e}")
+        
+        # 方法2：嘗試從 TCFD generator/logs 讀取（王子路徑寫入的路徑）
+        _current_file = Path(__file__)  # company1.1-3.6/content_pptx_company.py
+        _base_dir = _current_file.parent.parent  # ESG--report/
+        log_dir2 = _base_dir / "TCFD generator" / "logs"
+        print(f"[Express _read_industry_analysis_express] 方法2: 使用 TCFD generator/logs: {log_dir2}")
+        print(f"[Express] log_dir2.exists(): {log_dir2.exists()}")
+        
+        if log_dir2.exists():
+            industry_analysis_files = sorted(
+                log_dir2.glob("session_*_industry_analysis.json"),
+                key=lambda f: f.stat().st_mtime,
+                reverse=True
+            )
+            if industry_analysis_files:
+                log_file = industry_analysis_files[0]
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                    industry_analysis = data.get("industry_analysis", "").strip()
+                    if industry_analysis and len(industry_analysis) > 50:
+                        print(f"[Express] ✅ 方法2成功: 從 {log_file.name} 讀取 {len(industry_analysis)}字")
+                        return industry_analysis
+                except Exception as e:
+                    print(f"[Express] 方法2讀取失敗: {e}")
+        
+        print(f"[Express] ❌ 所有方法都失敗，無法讀取 150 字分析")
+        return ""
     
     def _build_industry_first_prompt(self, base_prompt: str, industry: str) -> str:
         """
