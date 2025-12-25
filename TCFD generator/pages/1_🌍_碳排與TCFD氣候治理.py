@@ -421,10 +421,25 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     
     try:
         # 導入 industry_analysis 模組（+1 步驟：第一個 LLM 調用，皇帝路徑）
-        BASE_DIR = Path(__file__).parent.parent  # TCFD generator -> ESG--report
-        company_path = BASE_DIR / "company1.1-3.6"
-        sys.path.insert(0, str(company_path))
-        from industry_analysis import generate_industry_analysis
+        # 使用絕對路徑，不依賴 sys.path
+        import importlib.util
+        industry_analysis_path = r"C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\industry_analysis.py"
+        
+        # 強制清除緩存
+        module_name = 'industry_analysis'
+        if module_name in sys.modules:
+            del sys.modules[module_name]
+        
+        # 使用絕對路徑導入
+        spec = importlib.util.spec_from_file_location(module_name, industry_analysis_path)
+        industry_analysis_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(industry_analysis_module)
+        generate_industry_analysis = industry_analysis_module.generate_industry_analysis
+        
+        # 驗證函數簽名
+        import inspect
+        sig = inspect.signature(generate_industry_analysis)
+        st.write(f"[DEBUG] generate_industry_analysis 簽名: {sig}")
         
         # 調用 generate_industry_analysis() 生成 150 字分析（皇帝路徑 - 簡化引擎）
         # 只傳 session_id，所有數據從 log 讀取
