@@ -457,6 +457,36 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         st.session_state.tcfd_output_folder = tcfd_output_folder
         st.info(f"📁 TCFD 輸出資料夾：{tcfd_output_folder}")
     
+    # +1 步驟：TCFD 五個表格完成後，立即生成產業別分析（150字），硬寫入 log
+    st.info("📊 正在生成產業別分析（150字）...")
+    try:
+        # 導入 industry_analysis 模組
+        BASE_DIR = Path(__file__).parent.parent.parent  # ESG go/
+        company_path = BASE_DIR / "company1.1-3.6"
+        sys.path.insert(0, str(company_path))
+        from industry_analysis import generate_industry_analysis
+        
+        # 取得月電費
+        monthly_bill = company_profile.get("monthly_bill_ntd", 0.0)
+        if not monthly_bill:
+            monthly_bill = company_profile.get("monthly_electricity_bill_ntd", 0.0)
+        
+        # 取得 session_id（從已保存的 log 或生成新的）
+        session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+        # 保存到 session_state 供後續使用
+        st.session_state.session_id = session_id
+        
+        # 調用 generate_industry_analysis() 生成 150 字分析
+        industry_analysis_data = generate_industry_analysis(
+            industry=industry,
+            monthly_electricity_bill_ntd=monthly_bill,
+            session_id=session_id
+        )
+        
+        st.success(f"✅ 產業別分析已生成並寫入 log（{len(industry_analysis_data.get('industry_analysis', ''))}字）")
+    except Exception as e:
+        st.warning(f"⚠️ 產業別分析生成失敗: {e}，將繼續流程")
+    
     st.balloons()
     st.session_state.step1_done = True
     
@@ -630,12 +660,14 @@ else:
                 engine.save(str(output_path))
                 
                 if output_path.exists():
-                    # 生成摘要
+                    # 生成摘要（此時會使用 log 中的 150 字分析，已在 TCFD 表格完成後生成）
+                    session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
                     context_data = {
                         "industry": industry_name,
                         "company_profile": company_profile,
                         "emission_data": emission_data,
-                        "tcfd_summary": st.session_state.get("tcfd_summary", {})
+                        "tcfd_summary": st.session_state.get("tcfd_summary", {}),
+                        "session_id": session_id
                     }
                     summary = generate_report_summary("Step 1", context_data, API_KEY, test_mode)
                     

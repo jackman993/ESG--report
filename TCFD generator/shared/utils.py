@@ -245,15 +245,62 @@ def generate_report_summary(step: str, context_data: dict, api_key: str, test_mo
             company_profile = context_data.get("company_profile", {})
             emission_data = context_data.get("emission_data", {})
             tcfd_summary = context_data.get("tcfd_summary", {})
+            session_id = context_data.get("session_id", "")
             
-            prompt = f"""請為以下ESG環境段報告生成200字摘要：
+            # 讀取 150 字產業別分析（硬插入）
+            industry_analysis = ""
+            if session_id:
+                try:
+                    import json
+                    from pathlib import Path
+                    log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+                    log_file = log_dir / f"session_{session_id}_industry_analysis.json"
+                    
+                    if log_file.exists():
+                        with open(log_file, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                        industry_analysis = data.get("industry_analysis", "").strip()
+                        if industry_analysis:
+                            print(f"[摘要生成] 讀取到 150 字分析: {len(industry_analysis)}字")
+                except Exception as e:
+                    print(f"[WARN] 讀取 150 字分析失敗: {e}")
+            
+            # 150字硬切入 prompt 最前面
+            if industry_analysis:
+                prompt = f"""【硬性要求 - 產業別分析（必須嚴格遵守）】
+{industry_analysis}
+
+【任務】
+請根據上述產業別分析，生成200字ESG環境段報告摘要。
+
+【要求】
+1. 必須引用上述產業別分析中的具體數據（如年營收、碳排數據、耗能等級等）
+2. 內容必須與上述產業別分析一致
+3. 重點說明：
+   - 公司的環境治理架構
+   - 碳排放管理策略
+   - TCFD氣候風險因應措施
+   - 永續發展目標與成果
+
+【補充資訊】
+**產業類別：** {industry}
+**公司規模：** {company_profile.get('size', '未知')}
+**年度營收：** {company_profile.get('annual_revenue_wan', '未知')}萬元
+**碳排放數據：** {emission_data.get('total', emission_data.get('total_emission', '未提供'))}
+**TCFD轉型風險：** {tcfd_summary.get('transformation_policy', '未提供')[:100] if tcfd_summary.get('transformation_policy') else '未提供'}
+**TCFD市場風險：** {tcfd_summary.get('market_trend', '未提供')[:100] if tcfd_summary.get('market_trend') else '未提供'}
+
+摘要要求：精簡、專業、突出重點，約200字。**重要：請使用純文本格式，不要使用 Markdown 標題（如 #、##）或任何格式符號，直接輸出摘要文字即可。**"""
+            else:
+                # 如果沒有150字分析，使用原來的 prompt
+                prompt = f"""請為以下ESG環境段報告生成200字摘要：
 
 **產業類別：** {industry}
 **公司規模：** {company_profile.get('size', '未知')}
 **年度營收：** {company_profile.get('annual_revenue_wan', '未知')}萬元
 
 **碳排放數據：**
-{emission_data.get('total_emission', '未提供')}
+{emission_data.get('total', emission_data.get('total_emission', '未提供'))}
 
 **TCFD氣候風險摘要：**
 - 轉型風險：{tcfd_summary.get('transformation_policy', '未提供')[:100] if tcfd_summary.get('transformation_policy') else '未提供'}
