@@ -408,10 +408,11 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_cooperation_info(self) -> str:
-        # 直接使用獨立管線讀取的產業別
+        # 直接使用 log 中的產業別分析（這是所有 LLM 的第一個起始點）
         industry = self.industry
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
         company_context = self.env_context.get("company_context", "") if self.env_context else ""
+        industry_analysis = self.env_context.get("industry_analysis", "") if self.env_context else ""
         tcfd_market = self.env_context.get("tcfd_market_context", "") if self.env_context else ""
         
         # 構建基礎 prompt
@@ -435,8 +436,12 @@ class PPTContentEngine:
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
         prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
         
-        if company_context:
+        # 優先使用產業別分析（這是所有 LLM 的第一個起始點）
+        if industry_analysis:
+            prompt += f"\n\n【產業別分析】（這是所有分析的基礎）：\n{industry_analysis}"
+        elif company_context:
             prompt += f"\n\n公司背景：{company_context}"
+        
         if industry:
             prompt += f"\n\n產業別：{industry}"
         if tcfd_market and len(tcfd_market) < 500:

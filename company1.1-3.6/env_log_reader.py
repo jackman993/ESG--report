@@ -388,10 +388,18 @@ def get_prompt_context(log_data: Optional[Dict[str, Any]] = None) -> Dict[str, s
     if company_size:
         company_context += f" 公司規模：{company_size}。"
     
+    # 產業別分析（優先使用，這是所有 LLM 的第一個起始點）
+    industry_analysis = log_data.get("industry_analysis", "")
+    energy_level = log_data.get("energy_level", "")
+    estimated_annual_revenue_ntd = log_data.get("estimated_annual_revenue_ntd", 0.0)
+    
     return {
         "industry": industry,
         "company_name": company_name if company_name else "本公司",
         "company_context": company_context.strip(),
+        "industry_analysis": industry_analysis,  # 產業別分析（150字）
+        "energy_level": energy_level,  # 耗能等級
+        "estimated_annual_revenue_ntd": estimated_annual_revenue_ntd,  # LLM 計算的年營收
         "tcfd_policy_context": log_data.get("tcfd_policy_regulation", ""),
         "tcfd_market_context": log_data.get("tcfd_market_trends", ""),
         "emission_context": f"Total annual carbon emissions: {log_data.get('emission_total_tco2e', 0.0):.2f} tCO₂e.",
