@@ -80,11 +80,17 @@ class PPTContentEngine:
     
     def _read_industry_analysis_express(self) -> str:
         """
-        Express 通道：直接從 +1 步驟生成的 150 字分析文件讀取（絕對路徑，不抽象）
+        Express 通道：直接從 +1 步驟生成的 150 字分析文件讀取（統一使用 TCFD generator/logs）
         只讀取 150 字分析，不抽取產業別
         """
-        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+        # 統一使用與 industry_analysis.py 相同的路徑計算方式
+        from pathlib import Path
+        _current_file = Path(__file__)  # company1.1-3.6/content_pptx_company.py
+        _base_dir = _current_file.parent.parent  # ESG--report/
+        log_dir = _base_dir / "TCFD generator" / "logs"
+        
         if not log_dir.exists():
+            print(f"[Express] Log 目錄不存在: {log_dir}")
             return ""
         
         # 直接讀取最新的 industry_analysis.json 文件（+1 步驟生成的）
@@ -95,10 +101,10 @@ class PPTContentEngine:
         )
         
         if not industry_analysis_files:
-            print(f"[Express] 找不到 industry_analysis.json 文件")
+            print(f"[Express] 找不到 industry_analysis.json 文件（在 {log_dir}）")
             return ""
         
-        # 讀取最新的文件（絕對路徑）
+        # 讀取最新的文件
         log_file = industry_analysis_files[0]
         try:
             with open(log_file, "r", encoding="utf-8") as f:
