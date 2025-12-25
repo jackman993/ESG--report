@@ -229,13 +229,15 @@ class PPTContentEngine:
             industry_prefix = ""
             industry_analysis = None
         
-        # 如果 prompt 就是 150 字摘要（包含年營收、tCO₂、耗能、電費等關鍵詞），直接使用
-        prompt_is_analysis = len(prompt) > 200 and ("年營收" in prompt or "tCO₂" in prompt or "耗能" in prompt or "電費" in prompt)
+        # 檢查 prompt 是否已經包含 150 字摘要（檢查實際內容，不檢查標題）
+        prompt_has_analysis = len(prompt) > 200 and ("年營收" in prompt or "tCO₂" in prompt or "耗能" in prompt or "電費" in prompt)
         
-        if prompt_is_analysis:
-            # prompt 就是 150 字摘要，直接使用，不添加任何模板文字
+        if prompt_has_analysis:
+            # prompt 已經包含 150 字摘要，直接使用，不再重複添加
             content = prompt
-            print(f"[DEBUG _call] prompt就是150字摘要，直接使用，長度={len(content)}字")
+            print(f"[DEBUG _call] prompt已包含150字摘要，直接使用，不重複添加")
+            print(f"[DEBUG _call] 實際傳給LLM的content長度: {len(content)}字")
+            print(f"[DEBUG _call] 實際傳給LLM的content前300字: {content[:300]}")
         else:
             # prompt 不包含 150 字摘要，需要添加
             if add_system_prompt:
@@ -581,11 +583,21 @@ class PPTContentEngine:
             # 如果讀取失敗，直接返回錯誤信息
             return f"[錯誤] 無法讀取150字產業分析，請確認log文件是否存在"
         
-        # 直接使用 150 字摘要作為 prompt，刪除所有模板文字（B），替換成 150 字摘要（A）
-        print(f"[generate_cooperation_info] ✅ 直接使用150字摘要作為prompt，長度={len(industry_analysis)}字")
+        # 直接硬寫入 150 字摘要，刪除所有可能觸發模板的文字
+        # 不使用「公司概況」等詞，改用「描述」或直接要求改寫
+        full_prompt = f"""{industry_analysis}
+
+請根據上述內容，撰寫 {company_name} 的描述。必須直接使用上述內容中的資訊和數據。"""
         
-        # 直接調用 LLM，prompt 就是 150 字摘要，沒有任何模板文字
-        return self._call(industry_analysis, word_count=230, is_chinese=True, add_system_prompt=False)
+        print(f"[generate_cooperation_info] ✅ 已硬寫入150字摘要，長度={len(industry_analysis)}字")
+        print(f"[generate_cooperation_info] 150字摘要內容: {industry_analysis[:100]}...")
+        print(f"[generate_cooperation_info] 完整prompt長度: {len(full_prompt)}字")
+        print(f"[generate_cooperation_info] 完整prompt前200字: {full_prompt[:200]}")
+        
+        # 直接調用 LLM，確保 prompt 真的被傳遞
+        result = self._call(full_prompt, word_count=230, is_chinese=True, add_system_prompt=False)
+        print(f"[generate_cooperation_info] LLM返回結果長度: {len(result)}字")
+        return result
 
     def generate_cooperation_financial(self) -> str:
         # 整合環境段 log 資料（營收資訊）
