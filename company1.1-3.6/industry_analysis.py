@@ -16,40 +16,76 @@ DEFAULT_LOG_DIR = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
 
 def _load_emission_data_from_log(session_id: str) -> Optional[float]:
     """
-    從前階段的 log 讀取碳排數據
+    從前階段的 log 讀取碳排數據（明確路徑）
+    直接讀取：session_{session_id}.json -> emission_data.total
     """
     log_dir = DEFAULT_LOG_DIR
     if not log_dir.exists():
         return None
     
-    # 找同 session 的 log 文件
-    for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
-        try:
-            with open(log_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            
-            # 檢查是否為同一個 session
-            file_session_id = data.get("session_id", "")
-            if str(file_session_id) != str(session_id):
-                continue
-            
-            # 優先從 emission_result 讀取
-            emission_result = data.get("emission_result", {})
-            if emission_result and "total" in emission_result:
-                total = emission_result.get("total", 0.0)
-                if total and total > 0:
-                    print(f"[產業別分析] 從 {log_file.name} 讀取碳排數據: {total:.2f} tCO₂e")
-                    return float(total)
-            
-            # 從 emission_data 讀取
-            emission_data = data.get("emission_data", {})
-            if emission_data and "total" in emission_data:
-                total = emission_data.get("total", 0.0)
-                if total and total > 0:
-                    print(f"[產業別分析] 從 {log_file.name} 讀取碳排數據: {total:.2f} tCO₂e")
-                    return float(total)
-        except Exception as e:
-            continue
+    # 明確路徑：直接讀取 session_{session_id}.json
+    log_file = log_dir / f"session_{session_id}.json"
+    
+    if not log_file.exists():
+        print(f"[WARN] 找不到 log 文件: {log_file.name}")
+        return None
+    
+    try:
+        with open(log_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # 明確路徑：emission_data.total
+        emission_data = data.get("emission_data", {})
+        if emission_data and "total" in emission_data:
+            total = emission_data.get("total", 0.0)
+            if total and total > 0:
+                print(f"[產業別分析] 從 {log_file.name} 讀取碳排數據（明確路徑）: {total:.2f} tCO₂e")
+                return float(total)
+        
+        # 備用路徑：emission_result.total
+        emission_result = data.get("emission_result", {})
+        if emission_result and "total" in emission_result:
+            total = emission_result.get("total", 0.0)
+            if total and total > 0:
+                print(f"[產業別分析] 從 {log_file.name} 讀取碳排數據（備用路徑）: {total:.2f} tCO₂e")
+                return float(total)
+    except Exception as e:
+        print(f"[ERROR] 讀取 {log_file.name} 失敗: {e}")
+        return None
+    
+    return None
+
+
+def _load_monthly_bill_from_log(session_id: str) -> Optional[float]:
+    """
+    從 log 讀取月電費（明確路徑）
+    直接讀取：session_{session_id}.json -> company_profile.monthly_bill_ntd
+    """
+    log_dir = DEFAULT_LOG_DIR
+    if not log_dir.exists():
+        return None
+    
+    # 明確路徑：直接讀取 session_{session_id}.json
+    log_file = log_dir / f"session_{session_id}.json"
+    
+    if not log_file.exists():
+        print(f"[WARN] 找不到 log 文件: {log_file.name}")
+        return None
+    
+    try:
+        with open(log_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # 明確路徑：company_profile.monthly_bill_ntd
+        company_profile = data.get("company_profile", {})
+        if company_profile and "monthly_bill_ntd" in company_profile:
+            monthly_bill = company_profile.get("monthly_bill_ntd", 0.0)
+            if monthly_bill and monthly_bill > 0:
+                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（明確路徑）: {monthly_bill:,.0f} NTD")
+                return float(monthly_bill)
+    except Exception as e:
+        print(f"[ERROR] 讀取 {log_file.name} 失敗: {e}")
+        return None
     
     return None
 
@@ -58,11 +94,11 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
     """
     生成產業別分析（150字）
     這是所有 LLM 調用的第一個，生成基礎數據
-    會從前階段的 log 讀取碳排數據，確保分析包含具體數據
+    會從前階段的 log 讀取碳排數據和月電費（明確路徑），確保分析包含具體數據
     
     Args:
         industry: 產業別
-        monthly_electricity_bill_ntd: 月電費（NTD）
+        monthly_electricity_bill_ntd: 月電費（NTD，如果為 0 則從 log 讀取）
         session_id: Session ID
     
     Returns:
@@ -76,7 +112,13 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
     # 解析模型
     model = CLAUDE_MODEL if CLAUDE_MODEL else "claude-3-haiku-20240307"
     
-    # 從前階段 log 讀取碳排數據
+    # 從 log 讀取月電費（明確路徑）
+    if not monthly_electricity_bill_ntd or monthly_electricity_bill_ntd == 0:
+        monthly_bill_from_log = _load_monthly_bill_from_log(session_id)
+        if monthly_bill_from_log:
+            monthly_electricity_bill_ntd = monthly_bill_from_log
+    
+    # 從 log 讀取碳排數據（明確路徑）
     emission_total_tco2e = _load_emission_data_from_log(session_id)
     
     # 構建 prompt（包含碳排數據）

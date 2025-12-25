@@ -468,41 +468,41 @@ class PPTContentEngine:
         print(f"[DEBUG generate_cooperation_info] industry_analysis 長度={len(industry_analysis) if industry_analysis else 0}")
         print(f"[DEBUG generate_cooperation_info] industry_analysis 前100字={industry_analysis[:100] if industry_analysis else 'None'}")
         
-        # 產業別優先：放在最前面，不能被其他內容蓋過
-        if industry:
-            prompt = f"【產業別：{industry}】\n\n"
-            prompt += f"本公司在{industry}產業營運。所有內容必須緊扣{industry}產業的特性。\n\n"
-            
-            # 直接插入產業別分析（150字，不經過解析）
-            if industry_analysis:
-                prompt += f"【產業別分析】（這是所有分析的基礎，必須遵守）：\n{industry_analysis}\n\n"
-                print(f"[OK] 已直接插入產業別分析到 prompt（{len(industry_analysis)}字）")
-            else:
-                print(f"[WARN] industry_analysis 為空，無法加入")
-            
-            prompt += self._format_expert_intro(company_name, industry)
-            prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
-            prompt += f"\n\n【必須遵守】在第一句中使用 {{COMPANY_NAME}} 作為公司名稱的佔位符，並明確提及{industry}產業。"
-            prompt += f"例如，以「{{COMPANY_NAME}} 是一家{industry}公司，擁有豐富的歷史...」或「{{COMPANY_NAME}} 在{industry}產業深耕多年...」開頭。"
-            prompt += f"\n\n【必須遵守】請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
-            prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
+        # 150字硬切入最前面，打掉原規則
+        if industry_analysis:
+            # 150字硬切入：放在最前面，成為主要指導
+            prompt = f"""【硬性要求 - 產業別分析（必須嚴格遵守）】
+{industry_analysis}
+
+【任務】
+請根據上述產業別分析，撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。
+
+【要求】
+1. 第一句使用 {{COMPANY_NAME}} 作為公司名稱佔位符
+2. 必須引用上述產業別分析中的具體數據（如年營收、碳排數據、耗能等級等）
+3. 內容必須與上述產業別分析一致
+4. 使用「我們」和「本公司」，保持第一人稱視角
+5. 使用簡潔的中文，不使用項目符號，保持高階主管語調
+
+【公司資訊】
+公司名稱：{company_name}
+產業別：{industry if industry else '未指定'}"""
+            print(f"[OK] 150字硬切入 prompt 最前面（{len(industry_analysis)}字），原規則已移除")
         else:
+            # 如果沒有150字分析，使用簡化版本
             prompt = self._format_expert_intro(company_name, industry)
             prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
-            prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
-            prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
-            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+            prompt += "\n\n第一句使用 {COMPANY_NAME} 作為公司名稱佔位符。"
+            prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角。"
+            prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
+            print(f"[WARN] industry_analysis 為空，使用簡化 prompt")
+        
+        # 只在沒有150字時才加入其他背景資訊
+        if not industry_analysis:
             if company_context:
                 prompt += f"\n\n公司背景：{company_context}"
-        
-        prompt += "\n\n總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
-        prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
-        prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
-        
-        if industry:
-            prompt += f"\n\n產業別：{industry}"
-        if tcfd_market and len(tcfd_market) < 500:
-            prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
+            if tcfd_market and len(tcfd_market) < 500:
+                prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
         
         # 最後檢查 prompt 是否包含產業別
         print(f"\n{'='*60}")
