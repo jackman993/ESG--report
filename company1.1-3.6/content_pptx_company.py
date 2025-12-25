@@ -34,13 +34,49 @@ class PPTContentEngine:
         self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         self.model = self._resolve_model()
         
-        # 載入環境段 log 資料
+        # 產業別：優先讀取，獨立管線，確保不被覆蓋
+        self.industry = self._load_industry_directly()
+        print(f"[產業別管線] 優先讀取: {repr(self.industry)}")
+        
+        # 載入環境段 log 資料（其他資料）
         self.env_log_data = self._load_environment_log()
         self.env_context = get_prompt_context(self.env_log_data)
         
-        # 產業別：直接從 env_context 取得（已經載入了，不需要重新讀文件）
-        self.industry = self.env_context.get("industry", "") if self.env_context else ""
-        print(f"[產業別] 從 env_context 取得: {repr(self.industry)}")
+        # 確保產業別不被覆蓋：如果 env_context 沒有，就用我們讀取的
+        if not self.env_context.get("industry", "") and self.industry:
+            self.env_context["industry"] = self.industry
+            print(f"[產業別管線] 插入 env_context: {repr(self.industry)}")
+        elif self.env_context.get("industry", ""):
+            # 如果 env_context 有，但我們讀取的不同，以我們讀取的為準（優先）
+            if self.industry and self.industry != self.env_context.get("industry", ""):
+                print(f"[產業別管線] 覆蓋 env_context: {self.env_context.get('industry')} -> {self.industry}")
+                self.env_context["industry"] = self.industry
+            else:
+                self.industry = self.env_context.get("industry", "")
+    
+    def _load_industry_directly(self) -> str:
+        """
+        獨立管線：直接讀取最新的 Step 1 文件中的產業別
+        不經過任何複雜流程，就這一個目的
+        """
+        log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+        if not log_dir.exists():
+            return ""
+        
+        # 找最新的 Step 1 文件
+        for log_file in sorted(log_dir.glob("*.json"), key=lambda f: f.stat().st_mtime, reverse=True):
+            try:
+                with open(log_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                step = str(data.get("step", "")).lower()
+                if "step 1" in step:
+                    ind = data.get("industry", "")
+                    if ind and str(ind).strip():
+                        print(f"[產業別管線] 從 {log_file.name} 讀取: {ind}")
+                        return str(ind).strip()
+            except:
+                continue
+        return ""
 
     def _resolve_model(self) -> str:
         candidates = []
