@@ -56,7 +56,7 @@ class PPTContentEngine:
     
     def _load_industry_directly(self) -> str:
         """
-        獨立管線：直接讀取最新的 Step 1 文件中的產業別
+        產業 Express 通道：直接讀取最新的 Step 1 文件中的產業別
         不經過任何複雜流程，就這一個目的
         """
         log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
@@ -72,11 +72,25 @@ class PPTContentEngine:
                 if "step 1" in step:
                     ind = data.get("industry", "")
                     if ind and str(ind).strip():
-                        print(f"[產業別管線] 從 {log_file.name} 讀取: {ind}")
+                        print(f"[產業 Express] 從 {log_file.name} 讀取: {ind}")
                         return str(ind).strip()
             except:
                 continue
         return ""
+    
+    def _build_industry_first_prompt(self, base_prompt: str, industry: str) -> str:
+        """
+        產業 Express 通道：構建產業別優先的 prompt
+        確保產業別在最前面，不被其他內容蓋過
+        """
+        if not industry:
+            return base_prompt
+        
+        # 產業別優先：放在最前面
+        industry_header = f"【產業別：{industry}】\n\n"
+        industry_header += f"本公司在{industry}產業營運。所有內容必須緊扣{industry}產業的特性。\n\n"
+        
+        return industry_header + base_prompt
 
     def _resolve_model(self) -> str:
         candidates = []
@@ -400,18 +414,22 @@ class PPTContentEngine:
         company_context = self.env_context.get("company_context", "") if self.env_context else ""
         tcfd_market = self.env_context.get("tcfd_market_context", "") if self.env_context else ""
         
-        prompt = self._format_expert_intro(company_name, industry)
-        prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
-        prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
-        prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
+        # 構建基礎 prompt
+        base_prompt = self._format_expert_intro(company_name, industry)
+        base_prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
         
         if industry:
-            prompt += f"\n\n【重要】本公司在{industry}產業營運。請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
-            prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
-            print(f"[DEBUG] prompt 已加入產業別: {industry}")
+            base_prompt += f"\n\n【重要】在第一句中使用 {{COMPANY_NAME}} 作為公司名稱的佔位符，並明確提及{industry}產業。"
+            base_prompt += f"例如，以「{{COMPANY_NAME}} 是一家{industry}公司，擁有豐富的歷史...」或「{{COMPANY_NAME}} 在{industry}產業深耕多年...」開頭。"
+            base_prompt += f"\n\n【必須遵守】請根據{industry}產業的特性，分析關係人、相關法律合規、市場衝擊，說明{industry}產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+            base_prompt += f"內容必須緊扣{industry}產業的特性，明確提及{industry}產業相關的法規、風險和治理要求。"
         else:
-            prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
-            print(f"[ERROR] prompt 未加入產業別！industry={repr(industry)}")
+            base_prompt += "\n\n重要：在第一句中使用 {COMPANY_NAME} 作為公司名稱的佔位符。"
+            base_prompt += "例如，以「{COMPANY_NAME} 公司擁有豐富的歷史...」或「{COMPANY_NAME} 是一家多元化...」開頭。"
+            base_prompt += f"\n\n【重要】請根據本公司所屬產業的特性，分析關係人、相關法律合規、市場衝擊，說明產業面臨的主要 ESG 挑戰（如環境影響、社會責任、治理需求），以及公司如何透過合作夥伴關係、組織架構和策略規劃來應對這些挑戰。"
+        
+        # 產業 Express 通道：構建產業別優先的 prompt
+        prompt = self._build_industry_first_prompt(base_prompt, industry)
         
         prompt += "總結背景、商業模式、地理足跡、策略夥伴關係和組織架構，強調使命、價值觀，以及合作如何支撐長期競爭力。"
         prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角，避免使用「貴公司」、「你們公司」等第三人稱。"
