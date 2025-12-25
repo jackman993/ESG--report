@@ -421,20 +421,21 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     
     try:
         # 導入 industry_analysis 模組（+1 步驟：第一個 LLM 調用，皇帝路徑）
-        # 完全重寫：使用絕對路徑，強制清除所有緩存
+        # 使用相對路徑，從當前文件位置計算（兼容本地和容器環境）
         import importlib.util
-        import importlib
         
-        # 絕對路徑
-        industry_analysis_path = r"C:\Users\User\Desktop\ESG report\ESG--report\company1.1-3.6\industry_analysis.py"
+        # 從當前文件計算相對路徑
+        current_file = Path(__file__)  # TCFD generator/pages/1_🌍_碳排與TCFD氣候治理.py
+        base_dir = current_file.parent.parent  # TCFD generator -> ESG--report
+        industry_analysis_path = base_dir / "company1.1-3.6" / "industry_analysis.py"
         
         # 清除所有可能的緩存
         modules_to_remove = [k for k in sys.modules.keys() if 'industry_analysis' in k]
         for mod in modules_to_remove:
             del sys.modules[mod]
         
-        # 使用絕對路徑直接載入
-        spec = importlib.util.spec_from_file_location("industry_analysis_fresh", industry_analysis_path)
+        # 使用相對路徑載入（兼容所有環境）
+        spec = importlib.util.spec_from_file_location("industry_analysis_fresh", str(industry_analysis_path))
         if spec is None or spec.loader is None:
             raise ImportError(f"無法載入模組: {industry_analysis_path}")
         

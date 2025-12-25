@@ -10,8 +10,11 @@ from datetime import datetime
 
 from config_pptx_company import ANTHROPIC_API_KEY, CLAUDE_MODEL, CLAUDE_MODEL_FALLBACKS
 
-# 絕對路徑（寫死，不抽象）
-LOG_FILE_BASE = r"C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\logs"
+# 使用相對路徑（兼容本地和容器環境）
+# 從當前文件位置計算：company1.1-3.6/industry_analysis.py -> TCFD generator/logs
+_current_file = Path(__file__)  # company1.1-3.6/industry_analysis.py
+_base_dir = _current_file.parent.parent  # ESG--report/
+LOG_FILE_BASE = _base_dir / "TCFD generator" / "logs"
 
 
 def generate_industry_analysis(session_id: str) -> Dict[str, Any]:
@@ -24,8 +27,10 @@ def generate_industry_analysis(session_id: str) -> Dict[str, Any]:
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     model = CLAUDE_MODEL if CLAUDE_MODEL else "claude-3-haiku-20240307"
     
-    # 絕對路徑讀取 log（寫死，不抽象）
-    log_file = f"{LOG_FILE_BASE}\\session_{session_id}.json"
+    # 相對路徑讀取 log（兼容所有環境）
+    log_file = LOG_FILE_BASE / f"session_{session_id}.json"
+    if not log_file.exists():
+        raise FileNotFoundError(f"找不到 log 文件: {log_file}")
     with open(log_file, "r", encoding="utf-8") as f:
         data = json.load(f)
     
@@ -99,11 +104,14 @@ def generate_industry_analysis(session_id: str) -> Dict[str, Any]:
 
 
 def save_industry_analysis_to_log(data: Dict[str, Any]) -> None:
-    """硬寫入 log（絕對路徑，寫死）"""
+    """硬寫入 log（相對路徑，兼容所有環境）"""
     import os
     
+    # 確保目錄存在
+    LOG_FILE_BASE.mkdir(parents=True, exist_ok=True)
+    
     session_id = data["session_id"]
-    log_file = f"{LOG_FILE_BASE}\\session_{session_id}_industry_analysis.json"
+    log_file = LOG_FILE_BASE / f"session_{session_id}_industry_analysis.json"
     
     with open(log_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
