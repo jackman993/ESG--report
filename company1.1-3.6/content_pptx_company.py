@@ -460,7 +460,7 @@ class PPTContentEngine:
         company_context = self.env_context.get("company_context", "") if self.env_context else ""
         tcfd_market = self.env_context.get("tcfd_market_context", "") if self.env_context else ""
         
-        # 直接讀取 log 文件中的產業別分析（150字）
+        # 直接讀取 log 文件中的產業別分析（150字）- 硬寫入，無條件判斷
         industry_analysis = self._read_industry_analysis_directly()
         
         # 調試：檢查實際值
@@ -468,41 +468,30 @@ class PPTContentEngine:
         print(f"[DEBUG generate_cooperation_info] industry_analysis 長度={len(industry_analysis) if industry_analysis else 0}")
         print(f"[DEBUG generate_cooperation_info] industry_analysis 前100字={industry_analysis[:100] if industry_analysis else 'None'}")
         
-        # 150字硬切入最前面，打掉原規則
-        if industry_analysis:
-            # 150字硬切入：放在最前面，成為主要指導
-            prompt = f"""【硬性要求 - 產業別分析（必須嚴格遵守）】
+        # 只有一個 prompt，硬寫入 150 字分析（無 if/else，無選擇）
+        prompt = f"""【⚠️ 最高優先級 - 產業別分析（必須嚴格遵守，不可違反）】
+以下產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離：
+
 {industry_analysis}
 
 【任務】
 請根據上述產業別分析，撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。
 
-【要求】
+【⚠️ 強制要求（必須遵守）】
 1. 第一句使用 {{COMPANY_NAME}} 作為公司名稱佔位符
-2. 必須引用上述產業別分析中的具體數據（如年營收、碳排數據、耗能等級等）
-3. 內容必須與上述產業別分析一致
+2. 【必須】引用上述產業別分析中的具體數據（如年營收、碳排數據、耗能等級等），不得忽略或抽象化
+3. 【必須】內容與上述產業別分析完全一致，不得產生矛盾
 4. 使用「我們」和「本公司」，保持第一人稱視角
 5. 使用簡潔的中文，不使用項目符號，保持高階主管語調
 
 【公司資訊】
 公司名稱：{company_name}
-產業別：{industry if industry else '未指定'}"""
-            print(f"[OK] 150字硬切入 prompt 最前面（{len(industry_analysis)}字），原規則已移除")
-        else:
-            # 如果沒有150字分析，使用簡化版本
-            prompt = self._format_expert_intro(company_name, industry)
-            prompt += f"\n\n請撰寫約 345 字（對應 230 英文單字）描述公司的合作概況，用於 ESG 報告。"
-            prompt += "\n\n第一句使用 {COMPANY_NAME} 作為公司名稱佔位符。"
-            prompt += "\n\n使用「我們」和「本公司」，保持第一人稱視角。"
-            prompt += "使用簡潔的中文，不使用項目符號，保持高階主管語調。"
-            print(f"[WARN] industry_analysis 為空，使用簡化 prompt")
+產業別：{industry if industry else '未指定'}
+
+【⚠️ 再次提醒】
+上述產業別分析是本次生成的核心基礎，所有內容必須基於此分析，不得偏離。"""
         
-        # 只在沒有150字時才加入其他背景資訊
-        if not industry_analysis:
-            if company_context:
-                prompt += f"\n\n公司背景：{company_context}"
-            if tcfd_market and len(tcfd_market) < 500:
-                prompt += f"\n\n市場摘要：{tcfd_market[:300]}"
+        print(f"[OK] 150字硬寫入 prompt（{len(industry_analysis) if industry_analysis else 0}字），無條件判斷，只有一個 prompt")
         
         # 最後檢查 prompt 是否包含產業別
         print(f"\n{'='*60}")
