@@ -507,7 +507,7 @@ class PPTContentEngine:
                 import json
                 from pathlib import Path
                 # 使用與 generate_report_summary 相同的路徑
-                log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+                log_dir = Path(os.path.join(r"C:\Users\User\Desktop\ESG_Output", "_Backend", "user_logs"))
                 # 或者嘗試從 session_id 讀取
                 session_id = self.env_context.get("session_id", "") if self.env_context else ""
                 if session_id:
