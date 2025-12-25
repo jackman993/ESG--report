@@ -492,8 +492,8 @@ class PPTContentEngine:
 
     def generate_cooperation_info(self) -> str:
         """
-        生成 1.1 我們的公司內容
-        硬寫入 150 字分析到 prompt，確保優先級
+        生成公司內容
+        直接使用 150 字摘要作為 prompt，無任何模板
         """
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
         
@@ -539,10 +539,8 @@ class PPTContentEngine:
             industry_analysis = """鋁建材業面臨嚴格的環保法規，包括空氣污染防制法及循環經濟相關規範，要求提升製程效率並減少廢料產生。市場趨勢朝向綠建築材料發展，鋁材因其可回收性及輕量化特性，在建築節能應用上需求持續成長。然而，鋁材製造屬能源密集型產業，面臨電力成本上漲及碳稅政策風險。月電費50,000元顯示該企業具一定生產規模，年碳排放總額71.10 tCO₂e相對較低，反映可能採用較環保的製程技術或生產規模適中。產業轉型壓力下，企業需投資節能設備及再生能源，並強化供應鏈碳管理。基於電費水準及產業特性判斷，此為中等耗能企業。耗能等級：中耗能。估算年營收：30,000,000 NTD。年碳排放總額：71.10 tCO₂e"""
             print(f"[generate_cooperation_info] 方法3：使用硬編碼的 150 字分析（長度: {len(industry_analysis)}字）")
         
-        # 刪除所有模板 prompt，只保留 150 字分析和基本任務
-        prompt = f"""{industry_analysis}
-
-請根據上述產業別分析，撰寫 {company_name} 的公司概況（約 345 字）。"""
+        # 直接使用 150 字摘要作為 prompt，無任何模板
+        prompt = industry_analysis
         
         print(f"[generate_cooperation_info] ✅ 極簡 prompt，150字分析長度={len(industry_analysis)}字")
         print(f"[generate_cooperation_info] ✅ prompt 內容:")
