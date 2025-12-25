@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 from datetime import datetime
 
-from config_pptx_company import CLAUDE_MODEL, CLAUDE_MODEL_FALLBACKS
+# 不再從 config 導入模型，直接使用與 TCFD 表格相同的模型
 
 # 使用相對路徑（兼容本地和容器環境）
 # 從當前文件位置計算：company1.1-3.6/industry_analysis.py -> TCFD generator/logs
@@ -80,7 +80,7 @@ def generate_industry_analysis(session_id: str, api_key: str = None, model: str 
 
     # 調用 LLM
     response = client.messages.create(
-        model=model,
+        model=final_model,
         max_tokens=500,
         messages=[
             {
