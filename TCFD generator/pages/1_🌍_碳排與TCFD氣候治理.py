@@ -459,6 +459,26 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     
     # +1 步驟：TCFD 五個表格完成後，立即生成產業別分析（150字），硬寫入 log
     st.info("📊 正在生成產業別分析（150字）...")
+    
+    # 導入追蹤器
+    tracker_path = Path(__file__).parent.parent / "logs" / "step1_plus1_tracker.py"
+    if tracker_path.exists():
+        sys.path.insert(0, str(tracker_path.parent))
+        from step1_plus1_tracker import log_plus1_step
+    
+    # 取得 session_id（從已保存的 log 或生成新的）
+    session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+    st.session_state.session_id = session_id
+    
+    # 記錄 +1 步驟開始
+    try:
+        log_plus1_step(session_id, "started", {
+            "industry": industry,
+            "step": "Step 1 - 子步驟2 (TCFD表格完成後)"
+        })
+    except:
+        pass
+    
     try:
         # 導入 industry_analysis 模組
         BASE_DIR = Path(__file__).parent.parent.parent  # ESG go/
@@ -471,11 +491,6 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         if not monthly_bill:
             monthly_bill = company_profile.get("monthly_electricity_bill_ntd", 0.0)
         
-        # 取得 session_id（從已保存的 log 或生成新的）
-        session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
-        # 保存到 session_state 供後續使用
-        st.session_state.session_id = session_id
-        
         # 調用 generate_industry_analysis() 生成 150 字分析
         industry_analysis_data = generate_industry_analysis(
             industry=industry,
@@ -483,9 +498,31 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
             session_id=session_id
         )
         
-        st.success(f"✅ 產業別分析已生成並寫入 log（{len(industry_analysis_data.get('industry_analysis', ''))}字）")
+        analysis_text = industry_analysis_data.get("industry_analysis", "")
+        analysis_length = len(analysis_text) if analysis_text else 0
+        
+        # 記錄 +1 步驟成功
+        try:
+            log_plus1_step(session_id, "success", {
+                "analysis_length": analysis_length,
+                "file_path": f"session_{session_id}_industry_analysis.json"
+            })
+        except:
+            pass
+        
+        st.success(f"✅ 產業別分析已生成並寫入 log（{analysis_length}字）")
     except Exception as e:
+        # 記錄 +1 步驟失敗
+        try:
+            log_plus1_step(session_id, "failed", {
+                "error": str(e),
+                "error_type": type(e).__name__
+            })
+        except:
+            pass
+        
         st.warning(f"⚠️ 產業別分析生成失敗: {e}，將繼續流程")
+        st.exception(e)  # 顯示完整錯誤信息
     
     st.balloons()
     st.session_state.step1_done = True

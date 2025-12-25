@@ -483,12 +483,7 @@ class PPTContentEngine:
         
         # 最後檢查 prompt 是否包含產業別
         print(f"\n{'='*60}")
-        print(f"[檢查] industry 變數值: {repr(industry)}")
-        print(f"[檢查] industry 是否為空: {not industry}")
         print(f"[檢查] prompt 長度: {len(prompt)}")
-        print(f"[檢查] prompt 是否包含產業別 '{industry}': {industry in prompt if industry else 'N/A'}")
-        if industry:
-            print(f"[檢查] prompt 中包含 '{industry}' 的次數: {prompt.count(industry)}")
         print(f"[檢查] prompt 完整內容:")
         print(prompt)
         print(f"{'='*60}\n")
