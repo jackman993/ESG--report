@@ -16,129 +16,42 @@ DEFAULT_LOG_DIR = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
 
 
 def _load_emission_data_from_log(session_id: str) -> Optional[float]:
-    """
-    從前階段的 log 讀取碳排數據（明確路徑）
-    優先從 TCFD generator/logs 讀取，如果沒有則從 DEFAULT_LOG_DIR 讀取
-    直接讀取：session_{session_id}.json -> emission_data.total
-    """
-    # 優先從 TCFD generator/logs 讀取
+    """從 log 讀取碳排數據：session_{session_id}.json -> emission_data.total"""
     log_file = TCFD_LOG_DIR / f"session_{session_id}.json"
     if not log_file.exists():
-        # 備用：從 DEFAULT_LOG_DIR 讀取
-        log_file = DEFAULT_LOG_DIR / f"session_{session_id}.json"
-    
-    if not log_file.exists():
-    
-    if not log_file.exists():
-        print(f"[WARN] 找不到 log 文件: {log_file.name}")
         return None
     
-    try:
-        with open(log_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        
-        # 明確路徑：emission_data.total
-        emission_data = data.get("emission_data", {})
-        if emission_data and "total" in emission_data:
-            total = emission_data.get("total", 0.0)
-            if total and total > 0:
-                print(f"[產業別分析] 從 {log_file.name} 讀取碳排數據（明確路徑）: {total:.2f} tCO₂e")
-                return float(total)
-        
-        # 備用路徑：emission_result.total
-        emission_result = data.get("emission_result", {})
-        if emission_result and "total" in emission_result:
-            total = emission_result.get("total", 0.0)
-            if total and total > 0:
-                print(f"[產業別分析] 從 {log_file.name} 讀取碳排數據（備用路徑）: {total:.2f} tCO₂e")
-                return float(total)
-    except Exception as e:
-        print(f"[ERROR] 讀取 {log_file.name} 失敗: {e}")
-        return None
+    with open(log_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
     
-    return None
+    total = data.get("emission_data", {}).get("total")
+    return float(total) if total else None
 
 
 def _load_monthly_bill_from_log(session_id: str) -> Optional[float]:
-    """
-    從 log 讀取月電費（明確路徑）
-    優先從 TCFD generator/logs 讀取，如果沒有則從 DEFAULT_LOG_DIR 讀取
-    直接讀取：session_{session_id}.json -> company_profile.monthly_bill_ntd 或 monthly_bill_ntd
-    """
-    # 優先從 TCFD generator/logs 讀取
+    """從 log 讀取月電費：session_{session_id}.json -> monthly_bill_ntd"""
     log_file = TCFD_LOG_DIR / f"session_{session_id}.json"
     if not log_file.exists():
-        # 備用：從 DEFAULT_LOG_DIR 讀取
-        log_file = DEFAULT_LOG_DIR / f"session_{session_id}.json"
-    
-    if not log_file.exists():
-    
-    if not log_file.exists():
-        print(f"[WARN] 找不到 log 文件: {log_file.name}")
         return None
     
-    try:
-        with open(log_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        
-        # 明確路徑1：company_profile.monthly_bill_ntd
-        company_profile = data.get("company_profile", {})
-        if company_profile and "monthly_bill_ntd" in company_profile:
-            monthly_bill = company_profile.get("monthly_bill_ntd", 0.0)
-            if monthly_bill and monthly_bill > 0:
-                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（company_profile.monthly_bill_ntd）: {monthly_bill:,.0f} NTD")
-                return float(monthly_bill)
-        
-        # 明確路徑2：monthly_bill_ntd（直接字段）
-        if "monthly_bill_ntd" in data:
-            monthly_bill = data.get("monthly_bill_ntd", 0.0)
-            if monthly_bill and monthly_bill > 0:
-                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（monthly_bill_ntd）: {monthly_bill:,.0f} NTD")
-                return float(monthly_bill)
-        
-        # 明確路徑3：monthly_bill（備用字段）
-        if "monthly_bill" in data:
-            monthly_bill = data.get("monthly_bill", 0.0)
-            if monthly_bill and monthly_bill > 0:
-                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（monthly_bill）: {monthly_bill:,.0f} NTD")
-                return float(monthly_bill)
-    except Exception as e:
-        print(f"[ERROR] 讀取 {log_file.name} 失敗: {e}")
-        return None
+    with open(log_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
     
-    return None
+    monthly_bill = data.get("monthly_bill_ntd") or data.get("company_profile", {}).get("monthly_bill_ntd")
+    return float(monthly_bill) if monthly_bill else None
 
 
 def _load_industry_from_log(session_id: str) -> Optional[str]:
-    """
-    從 log 讀取產業別（明確路徑）
-    優先從 TCFD generator/logs 讀取，如果沒有則從 DEFAULT_LOG_DIR 讀取
-    直接讀取：session_{session_id}.json -> industry
-    """
-    # 優先從 TCFD generator/logs 讀取
+    """從 log 讀取產業別：session_{session_id}.json -> industry"""
     log_file = TCFD_LOG_DIR / f"session_{session_id}.json"
     if not log_file.exists():
-        # 備用：從 DEFAULT_LOG_DIR 讀取
-        log_file = DEFAULT_LOG_DIR / f"session_{session_id}.json"
-    
-    if not log_file.exists():
-        print(f"[WARN] 找不到 log 文件: session_{session_id}.json")
         return None
     
-    try:
-        with open(log_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        
-        # 明確路徑：industry
-        industry = data.get("industry", "")
-        if industry and str(industry).strip():
-            print(f"[產業別分析] 從 {log_file.name} 讀取產業別: {industry}")
-            return str(industry).strip()
-    except Exception as e:
-        print(f"[ERROR] 讀取 {log_file.name} 失敗: {e}")
-        return None
+    with open(log_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
     
-    return None
+    industry = data.get("industry")
+    return str(industry).strip() if industry else None
 
 
 def generate_industry_analysis(session_id: str) -> Dict[str, Any]:
