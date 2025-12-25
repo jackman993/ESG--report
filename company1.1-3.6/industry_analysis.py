@@ -11,9 +11,11 @@ from datetime import datetime
 # 不再從 config 導入模型，直接使用與 TCFD 表格相同的模型
 
 # 使用相對路徑（兼容本地和容器環境）
+# 統一使用 TCFD generator/logs（與 TCFD 原來的 log 路徑一致）
 # 從當前文件位置計算：company1.1-3.6/industry_analysis.py -> TCFD generator/logs
 _current_file = Path(__file__)  # company1.1-3.6/industry_analysis.py
 _base_dir = _current_file.parent.parent  # ESG--report/
+# 統一使用 TCFD generator/logs（與 save_session_log 一致）
 LOG_FILE_BASE = _base_dir / "TCFD generator" / "logs"
 
 

@@ -551,26 +551,55 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         analysis_text = industry_analysis_data.get("industry_analysis", "")
         analysis_length = len(analysis_text) if analysis_text else 0
         
-        # 調試：檢查 log 文件是否存在
-        # 注意：industry_analysis.py 中 LOG_FILE_BASE 的計算方式
-        # _current_file = company1.1-3.6/industry_analysis.py
-        # _base_dir = _current_file.parent.parent = ESG--report/
-        # LOG_FILE_BASE = _base_dir / "TCFD generator" / "logs" = ESG--report/TCFD generator/logs
-        # 所以我們需要從 ESG--report 開始計算
+        # 檢查 log 文件是否存在（統一使用 TCFD generator/logs）
+        # industry_analysis.py 中 LOG_FILE_BASE = ESG--report/TCFD generator/logs
+        # 這裡從 base_dir (TCFD generator) 的 parent (ESG--report) 開始計算
         esg_report_dir = base_dir.parent  # TCFD generator -> ESG--report
         log_dir = esg_report_dir / "TCFD generator" / "logs"
         log_file = log_dir / f"session_{session_id}_industry_analysis.json"
-        st.write(f"[DEBUG] base_dir: {base_dir}")
-        st.write(f"[DEBUG] esg_report_dir: {esg_report_dir}")
-        st.write(f"[DEBUG] log_dir: {log_dir} (存在: {log_dir.exists()})")
-        st.write(f"[DEBUG] log_file 路徑: {log_file}")
-        st.write(f"[DEBUG] log_file 是否存在: {log_file.exists()}")
         
         if log_file.exists():
             st.success(f"✅ 【王子路徑】產業別分析已生成並寫入 log（{analysis_length}字）- 這是第 6 個步驟（只 log，不輸出 pptx）")
-            st.write(f"📁 Log 文件位置: {log_file}")
+            
+            # 顯示 log 文件信息，讓用戶可以確認並閱讀
+            with st.expander("📄 查看 150 字產業別分析（Log 文件內容）", expanded=True):
+                st.write(f"**📁 Log 文件位置：** `{log_file}`")
+                
+                # 讀取並顯示完整 log 文件內容
+                try:
+                    with open(log_file, "r", encoding="utf-8") as f:
+                        log_data = json.load(f)
+                    
+                    st.write("**📊 Log 文件內容：**")
+                    st.json(log_data)
+                    
+                    # 重點顯示 150 字分析
+                    if "industry_analysis" in log_data:
+                        st.divider()
+                        st.write("**📝 150 字產業別分析（核心內容）：**")
+                        st.text_area(
+                            "產業別分析內容",
+                            value=log_data["industry_analysis"],
+                            height=200,
+                            disabled=True,
+                            label_visibility="collapsed"
+                        )
+                        st.write(f"**字數：** {len(log_data['industry_analysis'])} 字")
+                    
+                    # 顯示其他關鍵信息
+                    if "industry" in log_data:
+                        st.write(f"**產業別：** {log_data['industry']}")
+                    if "monthly_electricity_bill_ntd" in log_data:
+                        st.write(f"**月電費：** {log_data['monthly_electricity_bill_ntd']:,.0f} NTD")
+                    if "emission_total_tco2e" in log_data:
+                        st.write(f"**年碳排放總額：** {log_data['emission_total_tco2e']:.2f} tCO₂e")
+                    if "timestamp" in log_data:
+                        st.write(f"**生成時間：** {log_data['timestamp']}")
+                        
+                except Exception as e:
+                    st.error(f"❌ 讀取 log 文件失敗: {e}")
         else:
-            st.warning(f"⚠️ 【王子路徑】Log 文件未找到: {log_file}")
+            st.error(f"❌ 【王子路徑】Log 文件未找到: {log_file}")
             st.write(f"📁 檢查目錄: {log_dir} (存在: {log_dir.exists()})")
             st.write(f"💡 提示：請檢查 industry_analysis.py 中的 LOG_FILE_BASE 路徑計算")
     except Exception as e:
