@@ -536,9 +536,13 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         sys.path.insert(0, str(company_path))
         from industry_analysis import generate_industry_analysis
         
-        # 調用函數（傳入 session_id 和 API_KEY）- 只寫入 log，不生成 pptx
-        # 使用 Streamlit UI 輸入的 API_KEY，而不是 config 中的硬編碼 key
-        industry_analysis_data = generate_industry_analysis(session_id=session_id, api_key=API_KEY.strip())
+        # 調用函數（傳入 session_id、API_KEY 和 model）- 只寫入 log，不生成 pptx
+        # 使用 Streamlit UI 輸入的 API_KEY 和與 TCFD 表格相同的模型
+        industry_analysis_data = generate_industry_analysis(
+            session_id=session_id, 
+            api_key=API_KEY.strip(),
+            model="claude-sonnet-4-20250514"  # 與 TCFD 5 個表格使用相同的模型
+        )
         
         analysis_text = industry_analysis_data.get("industry_analysis", "")
         analysis_length = len(analysis_text) if analysis_text else 0

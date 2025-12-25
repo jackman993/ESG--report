@@ -17,10 +17,11 @@ _base_dir = _current_file.parent.parent  # ESG--report/
 LOG_FILE_BASE = _base_dir / "TCFD generator" / "logs"
 
 
-def generate_industry_analysis(session_id: str, api_key: str = None) -> Dict[str, Any]:
+def generate_industry_analysis(session_id: str, api_key: str = None, model: str = None) -> Dict[str, Any]:
     """
     生成產業別分析（150字）- 寫死絕對路徑，不抽象
     api_key: 從 Streamlit UI 輸入的 API key（優先使用），如果為 None 則從 config 讀取
+    model: 模型名稱（優先使用），如果為 None 則使用與 TCFD 表格相同的模型
     """
     # 優先使用傳入的 api_key，否則從 config 讀取（向後兼容）
     if api_key:
@@ -33,7 +34,8 @@ def generate_industry_analysis(session_id: str, api_key: str = None) -> Dict[str
         raise RuntimeError("API key is not configured.")
     
     client = anthropic.Anthropic(api_key=final_api_key)
-    model = CLAUDE_MODEL if CLAUDE_MODEL else "claude-3-haiku-20240307"
+    # 優先使用傳入的 model，否則使用與 TCFD 表格相同的模型
+    final_model = model if model else "claude-sonnet-4-20250514"
     
     # 相對路徑讀取 log（兼容所有環境）
     log_file = LOG_FILE_BASE / f"session_{session_id}.json"
