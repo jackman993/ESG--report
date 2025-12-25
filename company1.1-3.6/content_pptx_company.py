@@ -495,30 +495,65 @@ class PPTContentEngine:
         return self._call(prompt, word_count=220, is_chinese=True)
 
     def generate_cooperation_info(self) -> str:
-        # 直接讀取 150 字分析（硬編碼到 content.py）
+        """
+        生成 1.1 我們的公司內容
+        硬寫入 150 字分析到 prompt，確保優先級
+        """
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
         
-        # 直接讀取 150 字分析
+        # 方法1：嘗試從 TCFD generator/logs 讀取
         industry_analysis = self._read_industry_analysis_express()
+        print(f"[generate_cooperation_info] 方法1讀取結果: 長度={len(industry_analysis) if industry_analysis else 0}字")
         
-        # 如果讀取失敗，使用硬編碼的 150 字分析（從 log 文件複製）
+        # 方法2：如果方法1失敗，嘗試從 UI 摘要使用的路徑讀取（與 generate_report_summary 一致）
+        if not industry_analysis or len(industry_analysis) < 50:
+            try:
+                import json
+                from pathlib import Path
+                # 使用與 generate_report_summary 相同的路徑
+                log_dir = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
+                # 或者嘗試從 session_id 讀取
+                session_id = self.env_context.get("session_id", "") if self.env_context else ""
+                if session_id:
+                    log_file = log_dir / f"session_{session_id}_industry_analysis.json"
+                    if log_file.exists():
+                        with open(log_file, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                        industry_analysis = data.get("industry_analysis", "").strip()
+                        print(f"[generate_cooperation_info] 方法2讀取成功: 長度={len(industry_analysis)}字")
+                else:
+                    # 如果沒有 session_id，讀取最新的文件
+                    industry_analysis_files = sorted(
+                        log_dir.glob("session_*_industry_analysis.json"),
+                        key=lambda f: f.stat().st_mtime,
+                        reverse=True
+                    )
+                    if industry_analysis_files:
+                        log_file = industry_analysis_files[0]
+                        with open(log_file, "r", encoding="utf-8") as f:
+                            data = json.load(f)
+                        industry_analysis = data.get("industry_analysis", "").strip()
+                        print(f"[generate_cooperation_info] 方法2讀取最新文件成功: {log_file.name}, 長度={len(industry_analysis)}字")
+            except Exception as e:
+                print(f"[generate_cooperation_info] 方法2讀取失敗: {e}")
+        
+        # 方法3：如果都失敗，使用硬編碼的 150 字分析（從最新 log 文件複製）
         if not industry_analysis or len(industry_analysis) < 50:
             # 硬編碼的 150 字分析（從最新 log 文件複製）
             industry_analysis = """鋁建材業面臨嚴格的環保法規，包括空氣污染防制法及循環經濟相關規範，要求提升製程效率並減少廢料產生。市場趨勢朝向綠建築材料發展，鋁材因其可回收性及輕量化特性，在建築節能應用上需求持續成長。然而，鋁材製造屬能源密集型產業，面臨電力成本上漲及碳稅政策風險。月電費50,000元顯示該企業具一定生產規模，年碳排放總額71.10 tCO₂e相對較低，反映可能採用較環保的製程技術或生產規模適中。產業轉型壓力下，企業需投資節能設備及再生能源，並強化供應鏈碳管理。基於電費水準及產業特性判斷，此為中等耗能企業。耗能等級：中耗能。估算年營收：30,000,000 NTD。年碳排放總額：71.10 tCO₂e"""
-            print(f"[generate_cooperation_info] 使用硬編碼的 150 字分析（長度: {len(industry_analysis)}字）")
-        else:
-            print(f"[generate_cooperation_info] 成功讀取 150 字分析（長度: {len(industry_analysis)}字）")
+            print(f"[generate_cooperation_info] 方法3：使用硬編碼的 150 字分析（長度: {len(industry_analysis)}字）")
         
-        # 測試用：極簡 prompt，只保留公司名稱和 150 字分析，讓 LLM 自由發揮
+        # 硬寫入 150 字分析到 prompt（確保優先級）
         prompt = f"""以下產業別分析：
 
 {industry_analysis}
 
 請根據上述產業別分析，撰寫描述 {company_name} 的合作概況。"""
         
-        print(f"[generate_cooperation_info] 測試模式：極簡 prompt，150字分析長度={len(industry_analysis)}字")
-        print(f"[generate_cooperation_info] prompt 內容:")
-        print(prompt)
+        print(f"[generate_cooperation_info] ✅ 最終 prompt 長度: {len(prompt)}字")
+        print(f"[generate_cooperation_info] ✅ 150字分析是否在 prompt 中: {'是' if industry_analysis in prompt else '否'}")
+        print(f"[generate_cooperation_info] ✅ prompt 前 300 字:")
+        print(prompt[:300])
         
         return self._call(prompt, word_count=230, is_chinese=True)
 
