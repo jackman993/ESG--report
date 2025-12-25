@@ -26,15 +26,37 @@ from tcfd_05_resource import create_table as create_05
 
 # ============ 後台 Log 函數 ============
 def save_session_log(session_data):
-    """儲存用戶 session log 到後台"""
-    session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = BACKEND_LOGS / f"session_{session_id}.json"
+    """儲存用戶 session log 到 TCFD generator/logs 文件夾"""
+    # 使用 TCFD generator/logs 文件夾
+    log_dir = Path(__file__).parent.parent / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    
+    # 使用現有的 session_id 或生成新的
+    session_id = session_data.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+    log_file = log_dir / f"session_{session_id}.json"
+    
+    # 如果文件已存在，讀取並合併數據
+    if log_file.exists():
+        try:
+            with open(log_file, "r", encoding="utf-8") as f:
+                existing_data = json.load(f)
+            # 合併數據（新數據覆蓋舊數據）
+            existing_data.update(session_data)
+            session_data = existing_data
+        except:
+            pass
     
     session_data["session_id"] = session_id
     session_data["timestamp"] = datetime.now().isoformat()
     
+    # 硬寫入 log 文件
     with open(log_file, "w", encoding="utf-8") as f:
         json.dump(session_data, f, ensure_ascii=False, indent=2)
+        f.flush()
+        import os
+        os.fsync(f.fileno())
+    
+    print(f"[TCFD Log] 已保存到: {log_file.name}")
     
     print(f"  ✓ Session log 已儲存: {log_file.name}")
     return log_file
@@ -293,16 +315,25 @@ if st.button("🧮 計算碳排放", type="primary", use_container_width=True, k
             st.session_state.industry_selected = industry_for_calc
         st.session_state.monthly_bill_from_step1 = emission_monthly_bill
         
-        # 保存 session log
+        # 保存 session log（產業、月電費、碳排數據）到 TCFD generator/logs
+        session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+        st.session_state.session_id = session_id
+        
         session_log = {
+            "session_id": session_id,
             "step": "Step 1 - 子步驟1",
             "industry": industry_for_calc,
             "monthly_bill": emission_monthly_bill,
+            "monthly_bill_ntd": emission_monthly_bill,  # 明確標示
             "company_profile": company_profile,
             "emission_data": emission_data_for_pptx,
+            "emission_result": {  # 備用路徑
+                "total": emission_data_for_pptx.get("total", 0.0)
+            },
             "calc_mode": calc_mode
         }
         save_session_log(session_log)
+        st.info(f"📝 已保存 log 到 TCFD generator/logs/session_{session_id}.json")
 
 st.divider()
 
@@ -329,6 +360,16 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
         st.error("請輸入月電費")
         st.stop()
     
+    # 檢查是否已完成子步驟1（碳排計算）
+    emission_data = st.session_state.get("emission_data", {})
+    if not emission_data:
+        st.error("❌ 請先完成子步驟1的碳排計算")
+        st.stop()
+    
+    # 取得 session_id（從 session_state 或生成新的）
+    session_id = st.session_state.get("session_id", datetime.now().strftime("%Y%m%d_%H%M%S"))
+    st.session_state.session_id = session_id
+    
     # 計算公司規模
     company_profile = calculate_company_profile(monthly_bill, industry)
     st.info(f"📊 企業規模：{company_profile['size']}（年營收約 {company_profile['revenue_display']}）")
@@ -340,6 +381,18 @@ if st.button("🚀 生成 5 個 TCFD 表格", type="primary", use_container_widt
     # 使用 industry_selected 來儲存（如果需要的話）
     if industry:
         st.session_state.industry_selected = industry
+    
+    # 確保 log 已保存（更新 log 包含最新數據）
+    session_log_update = {
+        "session_id": session_id,
+        "step": "Step 1 - 子步驟2 (TCFD表格生成前)",
+        "industry": industry,
+        "monthly_bill": monthly_bill,
+        "monthly_bill_ntd": monthly_bill,
+        "company_profile": company_profile,
+        "emission_data": emission_data
+    }
+    save_session_log(session_log_update)
     
     # ========== 【+1 步驟 - 皇帝路徑：第一個 LLM 調用，最優先執行】==========
     st.info("👑 【皇帝路徑】正在生成產業別分析（150字）- 第一個 LLM 調用...")

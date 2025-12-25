@@ -10,21 +10,24 @@ from datetime import datetime
 
 from config_pptx_company import ANTHROPIC_API_KEY, CLAUDE_MODEL, CLAUDE_MODEL_FALLBACKS
 
-# 預設 log 路徑
+# 預設 log 路徑（優先使用 TCFD generator/logs）
+TCFD_LOG_DIR = Path(r"C:\Users\User\Desktop\ESG report\ESG--report\TCFD generator\logs")
 DEFAULT_LOG_DIR = Path(r"C:\Users\User\Desktop\ESG_Output\_Backend\user_logs")
 
 
 def _load_emission_data_from_log(session_id: str) -> Optional[float]:
     """
     從前階段的 log 讀取碳排數據（明確路徑）
+    優先從 TCFD generator/logs 讀取，如果沒有則從 DEFAULT_LOG_DIR 讀取
     直接讀取：session_{session_id}.json -> emission_data.total
     """
-    log_dir = DEFAULT_LOG_DIR
-    if not log_dir.exists():
-        return None
+    # 優先從 TCFD generator/logs 讀取
+    log_file = TCFD_LOG_DIR / f"session_{session_id}.json"
+    if not log_file.exists():
+        # 備用：從 DEFAULT_LOG_DIR 讀取
+        log_file = DEFAULT_LOG_DIR / f"session_{session_id}.json"
     
-    # 明確路徑：直接讀取 session_{session_id}.json
-    log_file = log_dir / f"session_{session_id}.json"
+    if not log_file.exists():
     
     if not log_file.exists():
         print(f"[WARN] 找不到 log 文件: {log_file.name}")
@@ -59,14 +62,16 @@ def _load_emission_data_from_log(session_id: str) -> Optional[float]:
 def _load_monthly_bill_from_log(session_id: str) -> Optional[float]:
     """
     從 log 讀取月電費（明確路徑）
-    直接讀取：session_{session_id}.json -> company_profile.monthly_bill_ntd
+    優先從 TCFD generator/logs 讀取，如果沒有則從 DEFAULT_LOG_DIR 讀取
+    直接讀取：session_{session_id}.json -> company_profile.monthly_bill_ntd 或 monthly_bill_ntd
     """
-    log_dir = DEFAULT_LOG_DIR
-    if not log_dir.exists():
-        return None
+    # 優先從 TCFD generator/logs 讀取
+    log_file = TCFD_LOG_DIR / f"session_{session_id}.json"
+    if not log_file.exists():
+        # 備用：從 DEFAULT_LOG_DIR 讀取
+        log_file = DEFAULT_LOG_DIR / f"session_{session_id}.json"
     
-    # 明確路徑：直接讀取 session_{session_id}.json
-    log_file = log_dir / f"session_{session_id}.json"
+    if not log_file.exists():
     
     if not log_file.exists():
         print(f"[WARN] 找不到 log 文件: {log_file.name}")
@@ -76,13 +81,59 @@ def _load_monthly_bill_from_log(session_id: str) -> Optional[float]:
         with open(log_file, "r", encoding="utf-8") as f:
             data = json.load(f)
         
-        # 明確路徑：company_profile.monthly_bill_ntd
+        # 明確路徑1：company_profile.monthly_bill_ntd
         company_profile = data.get("company_profile", {})
         if company_profile and "monthly_bill_ntd" in company_profile:
             monthly_bill = company_profile.get("monthly_bill_ntd", 0.0)
             if monthly_bill and monthly_bill > 0:
-                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（明確路徑）: {monthly_bill:,.0f} NTD")
+                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（company_profile.monthly_bill_ntd）: {monthly_bill:,.0f} NTD")
                 return float(monthly_bill)
+        
+        # 明確路徑2：monthly_bill_ntd（直接字段）
+        if "monthly_bill_ntd" in data:
+            monthly_bill = data.get("monthly_bill_ntd", 0.0)
+            if monthly_bill and monthly_bill > 0:
+                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（monthly_bill_ntd）: {monthly_bill:,.0f} NTD")
+                return float(monthly_bill)
+        
+        # 明確路徑3：monthly_bill（備用字段）
+        if "monthly_bill" in data:
+            monthly_bill = data.get("monthly_bill", 0.0)
+            if monthly_bill and monthly_bill > 0:
+                print(f"[產業別分析] 從 {log_file.name} 讀取月電費（monthly_bill）: {monthly_bill:,.0f} NTD")
+                return float(monthly_bill)
+    except Exception as e:
+        print(f"[ERROR] 讀取 {log_file.name} 失敗: {e}")
+        return None
+    
+    return None
+
+
+def _load_industry_from_log(session_id: str) -> Optional[str]:
+    """
+    從 log 讀取產業別（明確路徑）
+    優先從 TCFD generator/logs 讀取，如果沒有則從 DEFAULT_LOG_DIR 讀取
+    直接讀取：session_{session_id}.json -> industry
+    """
+    # 優先從 TCFD generator/logs 讀取
+    log_file = TCFD_LOG_DIR / f"session_{session_id}.json"
+    if not log_file.exists():
+        # 備用：從 DEFAULT_LOG_DIR 讀取
+        log_file = DEFAULT_LOG_DIR / f"session_{session_id}.json"
+    
+    if not log_file.exists():
+        print(f"[WARN] 找不到 log 文件: session_{session_id}.json")
+        return None
+    
+    try:
+        with open(log_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        
+        # 明確路徑：industry
+        industry = data.get("industry", "")
+        if industry and str(industry).strip():
+            print(f"[產業別分析] 從 {log_file.name} 讀取產業別: {industry}")
+            return str(industry).strip()
     except Exception as e:
         print(f"[ERROR] 讀取 {log_file.name} 失敗: {e}")
         return None
@@ -112,11 +163,20 @@ def generate_industry_analysis(industry: str, monthly_electricity_bill_ntd: floa
     # 解析模型
     model = CLAUDE_MODEL if CLAUDE_MODEL else "claude-3-haiku-20240307"
     
+    # 從 log 讀取所有數據（產業別、月電費、碳排數據）
+    # 優先從 log 讀取，如果 log 中有數據則使用 log 的數據
+    industry_from_log = _load_industry_from_log(session_id)
+    if industry_from_log:
+        industry = industry_from_log
+        print(f"[產業別分析] 使用 log 中的產業別: {industry}")
+    
     # 從 log 讀取月電費（明確路徑）
-    if not monthly_electricity_bill_ntd or monthly_electricity_bill_ntd == 0:
-        monthly_bill_from_log = _load_monthly_bill_from_log(session_id)
-        if monthly_bill_from_log:
-            monthly_electricity_bill_ntd = monthly_bill_from_log
+    monthly_bill_from_log = _load_monthly_bill_from_log(session_id)
+    if monthly_bill_from_log:
+        monthly_electricity_bill_ntd = monthly_bill_from_log
+        print(f"[產業別分析] 使用 log 中的月電費: {monthly_bill_from_log:,.0f} NTD")
+    elif not monthly_electricity_bill_ntd or monthly_electricity_bill_ntd == 0:
+        print(f"[WARN] 月電費為空或 0，且 log 中沒有找到月電費數據")
     
     # 從 log 讀取碳排數據（明確路徑）
     emission_total_tco2e = _load_emission_data_from_log(session_id)
