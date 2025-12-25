@@ -214,22 +214,28 @@ class PPTContentEngine:
             is_chinese: 是否為中文生成（預設 True）
             add_system_prompt: 是否添加系統提示詞（預設 True，設為 False 時直接使用 prompt）
         """
-        # 硬插入 150 字摘要到所有 prompt 的前段
-        industry_analysis = self._read_industry_analysis_express()
-        if industry_analysis and len(industry_analysis) > 50:
-            # 在 prompt 前段硬插入 150 字摘要
-            industry_prefix = f"【產業別分析（必須遵循）】\n{industry_analysis}\n\n"
+        # 檢查 prompt 是否已包含 150 字摘要
+        # 如果已包含，不再重複讀取
+        prompt_has_analysis_check = "【產業別分析" in prompt or "產業別分析" in prompt
+        
+        if not prompt_has_analysis_check:
+            # prompt 不包含 150 字摘要，嘗試讀取並添加
+            industry_analysis = self._read_industry_analysis_express()
+            if industry_analysis and len(industry_analysis) > 50:
+                industry_prefix = f"{industry_analysis}\n\n"
+            else:
+                industry_prefix = ""
         else:
             industry_prefix = ""
+            industry_analysis = None
         
-        # 檢查 prompt 是否已經包含 150 字摘要
-        prompt_has_analysis = "【產業別分析" in prompt or "【核心資料" in prompt or "產業別分析（必須遵循）" in prompt
+        # 如果 prompt 就是 150 字摘要（包含年營收、tCO₂、耗能、電費等關鍵詞），直接使用
+        prompt_is_analysis = len(prompt) > 200 and ("年營收" in prompt or "tCO₂" in prompt or "耗能" in prompt or "電費" in prompt)
         
-        if prompt_has_analysis:
-            # prompt 已經包含 150 字摘要，直接使用，不再重複添加
+        if prompt_is_analysis:
+            # prompt 就是 150 字摘要，直接使用，不添加任何模板文字
             content = prompt
-            print(f"[DEBUG _call] prompt 已包含 150 字摘要，直接使用，不重複添加")
-            print(f"[DEBUG _call] 實際傳給 LLM 的 content 前 300 字: {content[:300]}")
+            print(f"[DEBUG _call] prompt就是150字摘要，直接使用，長度={len(content)}字")
         else:
             # prompt 不包含 150 字摘要，需要添加
             if add_system_prompt:
@@ -569,44 +575,17 @@ class PPTContentEngine:
         # 直接硬寫入 150 字摘要到 prompt，確保一定成功
         company_name = self.env_context.get("company_name", "本公司") if self.env_context else "本公司"
         
-        # 構建包含 150 字摘要的完整 prompt - 極端強制方式
-        if industry_analysis and len(industry_analysis) > 50:
-            # 將 150 字摘要放在最前面，作為主要內容，強制 LLM 使用
-            full_prompt = f"""【⚠️ 絕對禁止 - 違反將導致錯誤】
-絕對禁止使用以下任何詞彙或類似表達：
-- 「公司擁有悠久的歷史」
-- 「多年來一直致力於」
-- 「成為各行業的領導者」
-- 「跨國企業」「廣泛的業務版圖」
-- 「致力於成為...領導者」
-- 任何描述歷史、規模、領導地位的通用詞彙
-
-【唯一資料來源 - 必須嚴格遵循】
-{industry_analysis}
-
-【任務】
-基於上述唯一資料來源，撰寫 {company_name} 的公司概況。
-
-【強制要求】
-1. 第一句必須直接引用上述分析中的具體數據或產業資訊，不得使用任何通用開頭
-2. 必須明確提及上述分析中的具體數字：年營收、碳排數據、耗能等級、電費等
-3. 內容必須與上述分析完全一致，不得添加未提及的內容
-4. 不得使用「公司擁有悠久的歷史」「多年來一直致力於」等開頭
-
-【範例錯誤開頭（禁止）】
-❌ {company_name} 公司擁有悠久的歷史，多年來一直致力於成為各行業的領導者...
-❌ 作為一家跨國企業，我們在全球範圍內擁有廣泛的業務版圖...
-
-【正確做法】
-✅ 基於上述分析的具體數據和產業資訊開始寫作"""
-            print(f"[generate_cooperation_info] ✅ 已硬寫入 150 字摘要（長度: {len(industry_analysis)}字），使用極端強制模式")
-            print(f"[generate_cooperation_info] 前 300 字: {full_prompt[:300]}")
-        else:
-            full_prompt = f"請撰寫 {company_name} 的公司概況。"
-            print(f"[generate_cooperation_info] ⚠️ 未找到 150 字摘要，使用簡單 prompt")
+        # 確保 150 字摘要真的被寫入 - 直接硬寫入，不做任何判斷
+        if not industry_analysis or len(industry_analysis) < 50:
+            print(f"[ERROR] generate_cooperation_info: 150字摘要讀取失敗，長度={len(industry_analysis) if industry_analysis else 0}")
+            # 如果讀取失敗，直接返回錯誤信息
+            return f"[錯誤] 無法讀取150字產業分析，請確認log文件是否存在"
         
-        # 調用 LLM，直接傳入包含 150 字摘要的完整 prompt
-        return self._call(full_prompt, word_count=230, is_chinese=True, add_system_prompt=False)
+        # 直接使用 150 字摘要作為 prompt，刪除所有模板文字（B），替換成 150 字摘要（A）
+        print(f"[generate_cooperation_info] ✅ 直接使用150字摘要作為prompt，長度={len(industry_analysis)}字")
+        
+        # 直接調用 LLM，prompt 就是 150 字摘要，沒有任何模板文字
+        return self._call(industry_analysis, word_count=230, is_chinese=True, add_system_prompt=False)
 
     def generate_cooperation_financial(self) -> str:
         # 整合環境段 log 資料（營收資訊）
